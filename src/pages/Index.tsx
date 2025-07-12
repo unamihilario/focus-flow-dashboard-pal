@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -10,6 +9,7 @@ import { StudyTimer } from "@/components/StudyTimer";
 import { SubjectManager } from "@/components/SubjectManager";
 import { ProgressDashboard } from "@/components/ProgressDashboard";
 import { GoalSetter } from "@/components/GoalSetter";
+import { StudyLogs } from "@/components/StudyLogs";
 
 const Index = () => {
   const [isStudying, setIsStudying] = useState(false);
@@ -126,7 +126,7 @@ const Index = () => {
 
         {/* Main Content Tabs */}
         <Tabs defaultValue="study" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4 bg-white shadow-sm">
+          <TabsList className="grid w-full grid-cols-5 bg-white shadow-sm">
             <TabsTrigger value="study" className="data-[state=active]:bg-orange-100">
               Study Timer
             </TabsTrigger>
@@ -138,6 +138,9 @@ const Index = () => {
             </TabsTrigger>
             <TabsTrigger value="goals" className="data-[state=active]:bg-purple-100">
               Goals
+            </TabsTrigger>
+            <TabsTrigger value="logs" className="data-[state=active]:bg-indigo-100">
+              Study Logs
             </TabsTrigger>
           </TabsList>
 
@@ -163,6 +166,10 @@ const Index = () => {
               currentGoal={dailyGoal}
               onGoalChange={setDailyGoal}
             />
+          </TabsContent>
+
+          <TabsContent value="logs" className="space-y-6">
+            <StudyLogs />
           </TabsContent>
         </Tabs>
       </div>
