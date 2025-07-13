@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -9,6 +8,8 @@ import { Play, Pause, Square, BookOpen, Clock, Zap, Coffee, Timer, SkipForward }
 import { useToast } from "@/hooks/use-toast";
 import { useTabVisibility } from "@/hooks/useTabVisibility";
 import { useSpacedLearning } from "@/hooks/useSpacedLearning";
+import { useMLDataCollection } from "@/hooks/useMLDataCollection";
+import { MLDataCollector } from "@/components/MLDataCollector";
 
 interface StudyTimerProps {
   isStudying: boolean;
@@ -31,6 +32,9 @@ export const StudyTimer: React.FC<StudyTimerProps> = ({
   const { toast } = useToast();
   const isTabVisible = useTabVisibility();
   const spacedLearning = useSpacedLearning();
+  
+  // ML Data Collection
+  const mlDataCollection = useMLDataCollection(isStudying, selectedSubject);
 
   const subjects = [
     { id: "mathematics", name: "Mathematics", color: "bg-blue-500", emoji: "📐" },
@@ -132,6 +136,9 @@ export const StudyTimer: React.FC<StudyTimerProps> = ({
 
   const handleStopStudying = () => {
     if (currentSession && sessionTime > 60) {
+      // End ML data collection session
+      mlDataCollection.endSession();
+      
       toast({
         title: "Great work! 🎉",
         description: `You studied ${subjects.find(s => s.id === selectedSubject)?.name} for ${formatTime(sessionTime)}`,
@@ -196,6 +203,15 @@ export const StudyTimer: React.FC<StudyTimerProps> = ({
 
   return (
     <div className="space-y-6">
+      {/* ML Data Collector */}
+      <MLDataCollector
+        isStudying={isStudying}
+        currentMetrics={mlDataCollection.getCurrentMetrics()}
+        sessionCount={mlDataCollection.sessionData.length}
+        onEndSession={mlDataCollection.endSession}
+        onExportData={mlDataCollection.exportToCSV}
+      />
+
       {/* Main Timer Card */}
       <Card className="bg-gradient-to-br from-white to-orange-50 border-2 border-orange-100 shadow-lg">
         <CardHeader className="text-center pb-4">
