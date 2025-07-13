@@ -126,18 +126,23 @@ export const StudyTimer: React.FC<StudyTimerProps> = ({
   };
 
   const handleStopStudying = () => {
-    if (currentSession && sessionTime > 60) {
-      const currentMetrics = mlDataCollection.getCurrentMetrics();
-      const predictedRating = predictFocusLevel(
-        currentMetrics.tabSwitches,
-        sessionTime,
-        distractionLog.length
-      );
+    try {
+      if (currentSession && sessionTime > 60) {
+        const currentMetrics = mlDataCollection.getCurrentMetrics();
+        const predictedRating = predictFocusLevel(
+          currentMetrics.tabSwitches,
+          sessionTime,
+          distractionLog.length
+        );
 
-      // End ML data collection session with predicted rating
-      mlDataCollection.endSession(predictedRating);
-      
-      setShowRatingPopup(true);
+        // End ML data collection session with predicted rating
+        mlDataCollection.endSession(predictedRating);
+        
+        setShowRatingPopup(true);
+      }
+    } catch (error) {
+      console.log('Error during session end:', error);
+      // Continue with cleanup even if ML data collection fails
     }
     
     onToggleStudying(false);
