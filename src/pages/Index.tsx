@@ -17,8 +17,13 @@ const Index = () => {
   const [dailyGoal, setDailyGoal] = useState(120); // minutes
   const [studiedToday, setStudiedToday] = useState(45); // minutes
   const [currentStreak, setCurrentStreak] = useState(3);
+  const [activeTab, setActiveTab] = useState("study");
 
   const progressPercentage = Math.min((studiedToday / dailyGoal) * 100, 100);
+
+  const handleGoToLogs = () => {
+    setActiveTab("logs");
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-blue-50">
@@ -125,7 +130,7 @@ const Index = () => {
         </div>
 
         {/* Main Content Tabs */}
-        <Tabs defaultValue="study" className="space-y-6">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
           <TabsList className="grid w-full grid-cols-5 bg-white shadow-sm">
             <TabsTrigger value="study" className="data-[state=active]:bg-orange-100">
               Study Timer
@@ -150,6 +155,7 @@ const Index = () => {
               onToggleStudying={setIsStudying}
               currentSession={currentSession}
               onSessionChange={setCurrentSession}
+              onGoToLogs={handleGoToLogs}
             />
           </TabsContent>
 

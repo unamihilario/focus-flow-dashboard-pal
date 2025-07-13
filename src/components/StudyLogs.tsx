@@ -1,16 +1,19 @@
-
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Download, Calendar, Filter } from "lucide-react";
+import { Download, Calendar, Filter, Database } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useMLDataCollection } from "@/hooks/useMLDataCollection";
 
 export const StudyLogs = () => {
   const { toast } = useToast();
   const [timeFilter, setTimeFilter] = useState("week");
+  
+  // ML Data Collection hook for export functionality
+  const mlDataCollection = useMLDataCollection(false, "ai-ml-course");
   
   // Mock study log data - in a real app, this would come from your database
   const studyLogs = [
@@ -87,6 +90,14 @@ export const StudyLogs = () => {
     });
   };
 
+  const handleExportMLDataset = () => {
+    mlDataCollection.exportToCSV();
+    toast({
+      title: "ML Dataset exported! 📁",
+      description: "CSV file downloaded for your ML project submission.",
+    });
+  };
+
   const filteredLogs = getFilteredLogs();
   const totalTime = filteredLogs.reduce((sum, log) => sum + log.duration, 0);
   const avgFocusScore = filteredLogs.length > 0 
@@ -128,9 +139,17 @@ export const StudyLogs = () => {
             </SelectContent>
           </Select>
           
-          <Button onClick={downloadCSV} className="bg-gradient-to-r from-orange-400 to-orange-500 hover:from-orange-500 hover:to-orange-600">
+          <Button onClick={downloadCSV} variant="outline">
             <Download className="w-4 h-4 mr-2" />
-            Export CSV
+            Export Logs
+          </Button>
+
+          <Button 
+            onClick={handleExportMLDataset}
+            className="bg-gradient-to-r from-green-400 to-green-500 hover:from-green-500 hover:to-green-600"
+          >
+            <Database className="w-4 h-4 mr-2" />
+            Export ML Dataset
           </Button>
         </div>
       </div>

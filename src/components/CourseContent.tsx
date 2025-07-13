@@ -3,47 +3,52 @@ import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { BookOpen, ChevronLeft, ChevronRight, Clock, Target } from "lucide-react";
+import { BookOpen, ChevronLeft, ChevronRight, Clock, Target, Play } from "lucide-react";
 
 interface CourseContentProps {
   isStudying: boolean;
+  onStartStudying?: (unitIndex: number) => void;
+  currentUnit?: number;
 }
 
-export const CourseContent: React.FC<CourseContentProps> = ({ isStudying }) => {
-  const [currentUnit, setCurrentUnit] = useState(0);
+export const CourseContent: React.FC<CourseContentProps> = ({ 
+  isStudying, 
+  onStartStudying,
+  currentUnit = 0 
+}) => {
+  const [selectedUnit, setSelectedUnit] = useState(currentUnit);
 
   const courseUnits = [
     {
       title: "Unit 1: Introduction to Machine Learning",
-      duration: "45 minutes",
-      content: `
-# Introduction to Machine Learning
+      duration: "45 minutes", 
+      content: `Introduction to Machine Learning
 
-## What is Machine Learning?
+What is Machine Learning?
 
 Machine Learning (ML) is a subset of artificial intelligence (AI) that provides systems the ability to automatically learn and improve from experience without being explicitly programmed. ML focuses on the development of computer programs that can access data and use it to learn for themselves.
 
-## Key Concepts
+Key Concepts
 
-### 1. Types of Machine Learning
-- **Supervised Learning**: Learning with labeled examples
+1. Types of Machine Learning
+- Supervised Learning: Learning with labeled examples
   - Classification (predicting categories)
   - Regression (predicting continuous values)
-- **Unsupervised Learning**: Finding patterns in data without labels
+- Unsupervised Learning: Finding patterns in data without labels
   - Clustering
   - Dimensionality reduction
-- **Reinforcement Learning**: Learning through interaction and feedback
+- Reinforcement Learning: Learning through interaction and feedback
 
-### 2. The Machine Learning Process
-1. **Data Collection**: Gathering relevant data
-2. **Data Preprocessing**: Cleaning and preparing data
-3. **Feature Engineering**: Selecting and transforming variables
-4. **Model Selection**: Choosing appropriate algorithms
-5. **Training**: Teaching the model using data
-6. **Evaluation**: Testing model performance
-7. **Deployment**: Implementing the model in production
+2. The Machine Learning Process
+1. Data Collection: Gathering relevant data
+2. Data Preprocessing: Cleaning and preparing data
+3. Feature Engineering: Selecting and transforming variables
+4. Model Selection: Choosing appropriate algorithms
+5. Training: Teaching the model using data
+6. Evaluation: Testing model performance
+7. Deployment: Implementing the model in production
 
-### 3. Common Applications
+3. Common Applications
 - Image recognition and computer vision
 - Natural language processing
 - Recommendation systems
@@ -51,15 +56,15 @@ Machine Learning (ML) is a subset of artificial intelligence (AI) that provides 
 - Autonomous vehicles
 - Medical diagnosis
 
-## Why Machine Learning Matters
+Why Machine Learning Matters
 
 Machine learning has become crucial in our data-driven world because:
-- **Automation**: Reduces manual work and human error
-- **Scalability**: Can process vast amounts of data
-- **Personalization**: Provides customized experiences
-- **Prediction**: Helps forecast future trends and behaviors
+- Automation: Reduces manual work and human error
+- Scalability: Can process vast amounts of data
+- Personalization: Provides customized experiences
+- Prediction: Helps forecast future trends and behaviors
 
-## Getting Started
+Getting Started
 
 To begin your ML journey, you'll need to understand:
 1. Basic statistics and probability
@@ -67,60 +72,56 @@ To begin your ML journey, you'll need to understand:
 3. Data manipulation libraries (pandas, numpy)
 4. ML frameworks (scikit-learn, TensorFlow, PyTorch)
 
-## Next Steps
+Next Steps
 
 In the following units, we'll dive deeper into:
 - Data preprocessing techniques
 - Supervised learning algorithms
 - Model evaluation methods
-- Real-world case studies
-      `
+- Real-world case studies`
     },
     {
       title: "Unit 2: Data Preprocessing",
       duration: "60 minutes",
-      content: `
-# Data Preprocessing
+      content: `Data Preprocessing
 
-## Overview
+Overview
 Data preprocessing is a crucial step in the machine learning pipeline. Raw data is often messy, incomplete, or in formats that aren't suitable for ML algorithms.
 
-## Common Data Issues
+Common Data Issues
 - Missing values
 - Outliers
 - Inconsistent formats
 - Duplicate records
 - Irrelevant features
 
-## Preprocessing Techniques
-1. **Data Cleaning**
-2. **Feature Scaling**
-3. **Encoding Categorical Variables**
-4. **Handling Missing Data**
-      `
+Preprocessing Techniques
+1. Data Cleaning
+2. Feature Scaling
+3. Encoding Categorical Variables
+4. Handling Missing Data`
     },
     {
       title: "Unit 3: Supervised Learning Algorithms",
       duration: "75 minutes", 
-      content: `
-# Supervised Learning Algorithms
+      content: `Supervised Learning Algorithms
 
-## Classification Algorithms
+Classification Algorithms
 - Decision Trees
 - Random Forest
 - Support Vector Machines
 - Logistic Regression
 
-## Regression Algorithms
+Regression Algorithms
 - Linear Regression
 - Polynomial Regression
-- Ridge and Lasso Regression
-      `
+- Ridge and Lasso Regression`
     }
   ];
 
-  const currentUnitData = courseUnits[currentUnit];
+  const currentUnitData = courseUnits[selectedUnit];
 
+  // If not studying, show unit selection
   if (!isStudying) {
     return (
       <Card className="bg-gradient-to-br from-blue-50 to-indigo-50 border-blue-200">
@@ -131,10 +132,14 @@ Data preprocessing is a crucial step in the machine learning pipeline. Raw data 
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-blue-700 mb-4">Start studying to access course materials</p>
+          <p className="text-blue-700 mb-4">Select a unit to start studying</p>
           <div className="grid gap-3">
             {courseUnits.map((unit, index) => (
-              <div key={index} className="flex items-center justify-between p-3 bg-white rounded-lg border">
+              <div 
+                key={index} 
+                className="flex items-center justify-between p-4 bg-white rounded-lg border hover:border-blue-300 hover:shadow-md transition-all cursor-pointer"
+                onClick={() => onStartStudying?.(index)}
+              >
                 <div>
                   <h3 className="font-medium text-gray-900">{unit.title}</h3>
                   <div className="flex items-center text-sm text-gray-600 mt-1">
@@ -142,7 +147,10 @@ Data preprocessing is a crucial step in the machine learning pipeline. Raw data 
                     {unit.duration}
                   </div>
                 </div>
-                <Badge variant="outline">Ready</Badge>
+                <div className="flex items-center space-x-2">
+                  <Badge variant="outline" className="bg-green-50 text-green-700">Ready</Badge>
+                  <Play className="w-5 h-5 text-blue-500" />
+                </div>
               </div>
             ))}
           </div>
@@ -151,6 +159,7 @@ Data preprocessing is a crucial step in the machine learning pipeline. Raw data 
     );
   }
 
+  // If studying, show current unit content
   return (
     <Card className="bg-white border-blue-200 shadow-lg">
       <CardHeader className="bg-gradient-to-r from-blue-500 to-indigo-600 text-white">
@@ -160,7 +169,7 @@ Data preprocessing is a crucial step in the machine learning pipeline. Raw data 
             {currentUnitData.title}
           </div>
           <Badge variant="secondary" className="bg-white/20 text-white">
-            Unit {currentUnit + 1} of {courseUnits.length}
+            Unit {selectedUnit + 1} of {courseUnits.length}
           </Badge>
         </CardTitle>
       </CardHeader>
@@ -173,8 +182,8 @@ Data preprocessing is a crucial step in the machine learning pipeline. Raw data 
         
         <div className="flex justify-between items-center mt-8 pt-6 border-t">
           <Button
-            onClick={() => setCurrentUnit(Math.max(0, currentUnit - 1))}
-            disabled={currentUnit === 0}
+            onClick={() => setSelectedUnit(Math.max(0, selectedUnit - 1))}
+            disabled={selectedUnit === 0}
             variant="outline"
             className="flex items-center"
           >
@@ -188,8 +197,8 @@ Data preprocessing is a crucial step in the machine learning pipeline. Raw data 
           </div>
           
           <Button
-            onClick={() => setCurrentUnit(Math.min(courseUnits.length - 1, currentUnit + 1))}
-            disabled={currentUnit === courseUnits.length - 1}
+            onClick={() => setSelectedUnit(Math.min(courseUnits.length - 1, selectedUnit + 1))}
+            disabled={selectedUnit === courseUnits.length - 1}
             className="flex items-center"
           >
             Next Unit

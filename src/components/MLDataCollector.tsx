@@ -1,11 +1,7 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Brain, Download, Activity, Eye, Mouse, Keyboard, Timer, AlertTriangle } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
+import { Brain, Activity, Eye, Mouse, Keyboard, Timer, AlertTriangle } from "lucide-react";
 
 interface MLDataCollectorProps {
   isStudying: boolean;
@@ -17,39 +13,13 @@ interface MLDataCollectorProps {
     inactivityPeriods: number;
   };
   sessionCount: number;
-  onEndSession: (focusLevel?: 'attentive' | 'semi-attentive' | 'distracted') => void;
-  onExportData: () => void;
 }
 
 export const MLDataCollector: React.FC<MLDataCollectorProps> = ({
   isStudying,
   currentMetrics,
-  sessionCount,
-  onEndSession,
-  onExportData
+  sessionCount
 }) => {
-  const [manualFocusLevel, setManualFocusLevel] = useState<string>('');
-  const { toast } = useToast();
-
-  const handleEndWithRating = () => {
-    if (manualFocusLevel) {
-      onEndSession(manualFocusLevel as 'attentive' | 'semi-attentive' | 'distracted');
-      setManualFocusLevel('');
-      toast({
-        title: "Session data recorded! 📊",
-        description: "Your study session has been added to the ML dataset.",
-      });
-    }
-  };
-
-  const handleExport = () => {
-    onExportData();
-    toast({
-      title: "Dataset exported! 📁",
-      description: "CSV file downloaded for your ML project submission.",
-    });
-  };
-
   return (
     <div className="space-y-4">
       {/* Real-time Metrics */}
@@ -92,7 +62,7 @@ export const MLDataCollector: React.FC<MLDataCollectorProps> = ({
         </Card>
       )}
 
-      {/* Focus Level Rating */}
+      {/* Dataset Info */}
       <Card className="bg-gradient-to-br from-green-50 to-emerald-50 border-green-200">
         <CardHeader className="pb-3">
           <CardTitle className="text-lg flex items-center text-green-900">
@@ -102,59 +72,11 @@ export const MLDataCollector: React.FC<MLDataCollectorProps> = ({
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="text-sm text-green-700">
-            <p>Rate your focus level after each session to build labeled training data:</p>
-          </div>
-          
-          <div className="space-y-3">
-            <label className="text-sm font-medium text-green-800">How focused were you?</label>
-            <Select value={manualFocusLevel} onValueChange={setManualFocusLevel}>
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder="Rate your focus level" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="attentive">
-                  <div className="flex items-center space-x-2">
-                    <Badge className="bg-green-500 text-white">Attentive</Badge>
-                    <span className="text-sm">Fully focused, minimal distractions</span>
-                  </div>
-                </SelectItem>
-                <SelectItem value="semi-attentive">
-                  <div className="flex items-center space-x-2">
-                    <Badge className="bg-yellow-500 text-white">Semi-Attentive</Badge>
-                    <span className="text-sm">Mostly focused, some wandering</span>
-                  </div>
-                </SelectItem>
-                <SelectItem value="distracted">
-                  <div className="flex items-center space-x-2">
-                    <Badge className="bg-red-500 text-white">Distracted</Badge>
-                    <span className="text-sm">Hard to focus, many interruptions</span>
-                  </div>
-                </SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className="flex space-x-3">
-            <Button 
-              onClick={handleEndWithRating}
-              disabled={!manualFocusLevel || !isStudying}
-              className="flex-1"
-            >
-              Record Session Data
-            </Button>
-            <Button 
-              onClick={handleExport}
-              variant="outline"
-              disabled={sessionCount === 0}
-              className="flex-1"
-            >
-              <Download className="w-4 h-4 mr-2" />
-              Export Dataset
-            </Button>
+            <p>Your focus level is automatically rated based on interaction patterns and distractions detected during study sessions.</p>
           </div>
 
           <div className="text-xs text-green-600 bg-green-100 p-2 rounded">
-            <strong>For your submission:</strong> Study multiple sessions, rate your focus, then export the CSV dataset for your ML model training!
+            <strong>How it works:</strong> Study multiple sessions to build your dataset. The system automatically rates your focus and you can export the CSV dataset for ML model training!
           </div>
         </CardContent>
       </Card>
