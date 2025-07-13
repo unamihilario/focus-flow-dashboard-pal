@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useToast } from "@/hooks/use-toast";
 import { useTabVisibility } from "@/hooks/useTabVisibility";
@@ -6,6 +7,8 @@ import { useMLDataCollection } from "@/hooks/useMLDataCollection";
 import { CourseContent } from "@/components/CourseContent";
 import { FloatingTimer } from "@/components/FloatingTimer";
 import { SessionRatingPopup } from "@/components/SessionRatingPopup";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 
 interface StudyTimerProps {
   isStudying: boolean;
@@ -161,30 +164,32 @@ export const StudyTimer: React.FC<StudyTimerProps> = ({
   // Break time UI
   if (spacedLearning.isBreakTime) {
     return (
-      
-        
-          
-            
-            Break Time! 🌿
-          
-        
-        
-          
-            {spacedLearning.formatBreakTime(spacedLearning.breakTimeLeft)}
-          
-          
-            {spacedLearning.getNextBreakType() === 'long' 
-              ? "Long break - stretch, walk, or grab a snack!" 
-              : "Short break - rest your eyes and mind!"
-            }
-          
-          
-            
-            
-            Skip Break
-          
-        
-      
+      <div className="flex items-center justify-center min-h-[400px]">
+        <Card className="w-full max-w-md">
+          <CardHeader className="text-center">
+            <CardTitle className="text-2xl text-green-600">
+              Break Time! 🌿
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="text-center space-y-4">
+            <div className="text-4xl font-mono font-bold text-gray-900">
+              {spacedLearning.formatBreakTime(spacedLearning.breakTimeLeft)}
+            </div>
+            <p className="text-gray-600">
+              {spacedLearning.getNextBreakType() === 'long' 
+                ? "Long break - stretch, walk, or grab a snack!" 
+                : "Short break - rest your eyes and mind!"
+              }
+            </p>
+            <Button 
+              onClick={spacedLearning.skipBreak}
+              variant="outline"
+            >
+              Skip Break
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
     );
   }
 
