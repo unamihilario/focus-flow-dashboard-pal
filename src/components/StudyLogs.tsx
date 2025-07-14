@@ -160,8 +160,8 @@ export const StudyLogs = () => {
     URL.revokeObjectURL(url);
 
     toast({
-      title: "Study Logs Exported! 📊",
-      description: `Downloaded ${filteredLogs.length} sessions as CSV for Python analysis.`,
+      title: "CSV Exported! 📊",
+      description: `Downloaded ${filteredLogs.length} sessions as CSV file.`,
     });
   };
 
@@ -169,8 +169,8 @@ export const StudyLogs = () => {
     const result = mlDataCollection.exportToCSV();
     if (result) {
       toast({
-        title: "ML Dataset Exported! 🤖",
-        description: "CSV ready for Python/NumPy analysis and model training.",
+        title: "CSV Exported! 📊",
+        description: "Dataset downloaded successfully.",
       });
     } else {
       toast({
