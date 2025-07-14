@@ -9,6 +9,12 @@ interface SessionRatingPopupProps {
   isVisible: boolean;
   sessionTime: number;
   distractionCount: number;
+  totalDistractionTime: number;
+  distractionLog: Array<{
+    type: 'tab_switch' | 'navigation' | 'internal_navigation';
+    timestamp: number;
+    duration?: number;
+  }>;
   predictedRating: 'attentive' | 'semi-attentive' | 'distracted';
   onBackToUnits: () => void;
   onGoToLogs: () => void;
@@ -18,6 +24,8 @@ export const SessionRatingPopup: React.FC<SessionRatingPopupProps> = ({
   isVisible,
   sessionTime,
   distractionCount,
+  totalDistractionTime,
+  distractionLog,
   predictedRating,
   onBackToUnits,
   onGoToLogs
@@ -89,15 +97,44 @@ export const SessionRatingPopup: React.FC<SessionRatingPopupProps> = ({
             <p className="text-gray-600">{ratingInfo.description}</p>
           </div>
 
-          <div className="bg-gray-50 rounded-lg p-4 space-y-2">
-            <div className="flex justify-between text-sm">
-              <span className="text-gray-600">Study Time:</span>
-              <span className="font-medium">{formatTime(sessionTime)}</span>
+          <div className="bg-gray-50 rounded-lg p-4 space-y-3">
+            <div className="space-y-2">
+              <div className="flex justify-between text-sm">
+                <span className="text-gray-600">Study Time:</span>
+                <span className="font-medium">{formatTime(sessionTime)}</span>
+              </div>
+              <div className="flex justify-between text-sm">
+                <span className="text-gray-600">Distractions:</span>
+                <span className="font-medium">{distractionCount}</span>
+              </div>
+              <div className="flex justify-between text-sm">
+                <span className="text-gray-600">Distraction Time:</span>
+                <span className="font-medium">{formatTime(totalDistractionTime)}</span>
+              </div>
+              <div className="flex justify-between text-sm">
+                <span className="text-gray-600">Focus Percentage:</span>
+                <span className="font-medium">
+                  {sessionTime > 0 ? Math.round(((sessionTime - totalDistractionTime) / sessionTime) * 100) : 0}%
+                </span>
+              </div>
             </div>
-            <div className="flex justify-between text-sm">
-              <span className="text-gray-600">Distractions:</span>
-              <span className="font-medium">{distractionCount}</span>
-            </div>
+            
+            {distractionLog.length > 0 && (
+              <div className="border-t pt-3">
+                <p className="text-xs font-medium text-gray-700 mb-2">Distraction Details:</p>
+                <div className="space-y-1 max-h-24 overflow-y-auto">
+                  {distractionLog.map((distraction, index) => (
+                    <div key={index} className="text-xs text-gray-600 flex justify-between">
+                      <span>
+                        {distraction.type === 'tab_switch' ? '🔄 Tab Switch' : 
+                         distraction.type === 'internal_navigation' ? '📱 Page Switch' : '🔗 Navigation'}
+                      </span>
+                      <span>{distraction.duration ? formatTime(distraction.duration / 1000) : '-'}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
 
           <div className="flex space-x-3">

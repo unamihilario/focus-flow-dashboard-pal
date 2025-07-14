@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useToast } from "@/hooks/use-toast";
 import { useTabVisibility } from "@/hooks/useTabVisibility";
@@ -16,6 +15,7 @@ interface StudyTimerProps {
   currentSession: any;
   onSessionChange: (session: any) => void;
   onGoToLogs?: () => void;
+  onStudyTimeUpdate?: (minutes: number) => void;
 }
 
 export const StudyTimer: React.FC<StudyTimerProps> = ({
@@ -23,69 +23,125 @@ export const StudyTimer: React.FC<StudyTimerProps> = ({
   onToggleStudying,
   currentSession,
   onSessionChange,
-  onGoToLogs
+  onGoToLogs,
+  onStudyTimeUpdate
 }) => {
-  const [sessionTime, setSessionTime] = useState(0);
-  const [startTime, setStartTime] = useState<Date | null>(null);
-  const [distractionLog, setDistractionLog] = useState<{type: string, duration: number, timestamp: Date}[]>([]);
-  const [lastDistractionStart, setLastDistractionStart] = useState<Date | null>(null);
+  const [sessionTime, setSessionTime] = useState(() => {
+    const saved = localStorage.getItem('currentSessionTime');
+    return saved ? parseInt(saved) : 0;
+  });
+  const [startTime, setStartTime] = useState<Date | null>(() => {
+    const saved = localStorage.getItem('currentSessionStart');
+    return saved ? new Date(saved) : null;
+  });
+  const [distractionLog, setDistractionLog] = useState<Array<{
+    type: 'tab_switch' | 'navigation' | 'internal_navigation';
+    timestamp: number;
+    duration?: number;
+  }>>(() => {
+    const saved = localStorage.getItem('currentDistractionLog');
+    return saved ? JSON.parse(saved) : [];
+  });
+  const [lastDistractionStart, setLastDistractionStart] = useState<number | null>(() => {
+    const saved = localStorage.getItem('lastDistractionStart');
+    return saved ? parseInt(saved) : null;
+  });
   const [showRatingPopup, setShowRatingPopup] = useState(false);
-  const [currentUnit, setCurrentUnit] = useState(0);
+
   const { toast } = useToast();
   const isTabVisible = useTabVisibility();
   const spacedLearning = useSpacedLearning();
-  
-  // ML Data Collection for AI/ML course
   const mlDataCollection = useMLDataCollection(isStudying, "ai-ml-course");
 
-// Handle tab visibility changes - track distractions AND navigation between tabs
+  // Persist timer state
   useEffect(() => {
-    if (isStudying && !spacedLearning.isBreakTime) {
-      if (!isTabVisible && !lastDistractionStart) {
-        // Tab switched away - start tracking distraction
-        setLastDistractionStart(new Date());
-        toast({
-          title: "Tab switch detected 👀",
-          description: "Keep focused! Your distraction is being tracked.",
-          variant: "destructive"
-        });
-      } else if (isTabVisible && lastDistractionStart) {
-        // Tab came back - record distraction duration
-        const distractionDuration = Math.floor((Date.now() - lastDistractionStart.getTime()) / 1000);
-        if (distractionDuration >= 5) { // Record if 5+ seconds (lowered threshold)
-          setDistractionLog(prev => [...prev, {
-            type: "Tab Switch",
-            duration: distractionDuration,
-            timestamp: lastDistractionStart
-          }]);
-          toast({
-            title: "Distraction recorded 📊",
-            description: `${distractionDuration}s tab switch logged for ML analysis.`,
-          });
+    localStorage.setItem('currentSessionTime', sessionTime.toString());
+  }, [sessionTime]);
+
+  useEffect(() => {
+    if (startTime) {
+      localStorage.setItem('currentSessionStart', startTime.toISOString());
+    } else {
+      localStorage.removeItem('currentSessionStart');
+    }
+  }, [startTime]);
+
+  useEffect(() => {
+    localStorage.setItem('currentDistractionLog', JSON.stringify(distractionLog));
+  }, [distractionLog]);
+
+  useEffect(() => {
+    if (lastDistractionStart !== null) {
+      localStorage.setItem('lastDistractionStart', lastDistractionStart.toString());
+    } else {
+      localStorage.removeItem('lastDistractionStart');
+    }
+  }, [lastDistractionStart]);
+
+  // Track distraction events
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (isStudying && currentSession) {
+        const now = Date.now();
+        
+        if (document.hidden) {
+          // Tab became hidden - start tracking distraction
+          setLastDistractionStart(now);
+        } else {
+          // Tab became visible - end tracking distraction
+          if (lastDistractionStart) {
+            const duration = now - lastDistractionStart;
+            const newDistraction = {
+              type: 'tab_switch' as const,
+              timestamp: now,
+              duration
+            };
+            
+            setDistractionLog(prev => [...prev, newDistraction]);
+            setLastDistractionStart(null);
+          }
         }
-        setLastDistractionStart(null);
       }
-    }
-  }, [isTabVisible, isStudying, lastDistractionStart, spacedLearning.isBreakTime, toast]);
+    };
 
-  // Track internal navigation (between Study Timer tabs) as distractions
-  useEffect(() => {
-    if (isStudying && !spacedLearning.isBreakTime) {
-      const handleNavigation = () => {
-        setDistractionLog(prev => [...prev, {
-          type: "Navigation Switch",
-          duration: 2, // Minimal duration for navigation
-          timestamp: new Date()
-        }]);
-      };
-      
-      // Listen for route changes or navigation events
-      window.addEventListener('popstate', handleNavigation);
-      return () => window.removeEventListener('popstate', handleNavigation);
-    }
-  }, [isStudying, spacedLearning.isBreakTime]);
+    const handlePopState = () => {
+      if (isStudying && currentSession) {
+        const now = Date.now();
+        const newDistraction = {
+          type: 'navigation' as const,
+          timestamp: now,
+          duration: 0
+        };
+        
+        setDistractionLog(prev => [...prev, newDistraction]);
+      }
+    };
 
-  // Timer logic - runs continuously during study
+    const handleTabSwitch = (event: CustomEvent) => {
+      if (isStudying && currentSession) {
+        const { from, to, timestamp, type } = event.detail;
+        const newDistraction = {
+          type: type || 'internal_navigation' as const,
+          timestamp,
+          duration: 0
+        };
+        
+        setDistractionLog(prev => [...prev, newDistraction]);
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    window.addEventListener('popstate', handlePopState);
+    window.addEventListener('tabSwitch', handleTabSwitch as EventListener);
+
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      window.removeEventListener('popstate', handlePopState);
+      window.removeEventListener('tabSwitch', handleTabSwitch as EventListener);
+    };
+  }, [isStudying, currentSession, lastDistractionStart, mlDataCollection]);
+
+  // Timer and spaced learning logic
   useEffect(() => {
     let interval: NodeJS.Timeout;
     if (isStudying && startTime && !spacedLearning.isBreakTime) {
@@ -93,7 +149,7 @@ export const StudyTimer: React.FC<StudyTimerProps> = ({
         const elapsed = Math.floor((Date.now() - startTime.getTime()) / 1000);
         setSessionTime(elapsed);
         
-        // Check if it's time for a break (25 minutes = 1500 seconds)
+        // Check if it's time for a break
         if (elapsed >= spacedLearning.config.studyDuration * 60 && elapsed % (spacedLearning.config.studyDuration * 60) === 0) {
           spacedLearning.startBreak();
         }
@@ -102,20 +158,25 @@ export const StudyTimer: React.FC<StudyTimerProps> = ({
     return () => clearInterval(interval);
   }, [isStudying, startTime, spacedLearning]);
 
-  // Auto-predict focus level based on activity
-  const predictFocusLevel = (
-    tabSwitches: number,
-    sessionDuration: number,
-    distractionCount: number
-  ): 'attentive' | 'semi-attentive' | 'distracted' => {
-    const distractionScore = 
-      (tabSwitches > 3 ? 2 : 0) +
-      (distractionCount > 2 ? 2 : 0) +
-      (sessionDuration > 0 && distractionCount / (sessionDuration / 60) > 2 ? 1 : 0);
-
-    if (distractionScore >= 4) return 'distracted';
-    if (distractionScore >= 2) return 'semi-attentive';
-    return 'attentive';
+  const predictFocusLevel = (sessionDuration: number, totalDistractionTime: number): 'attentive' | 'semi-attentive' | 'distracted' => {
+    const sessionMinutes = sessionDuration / 60;
+    const distractionMinutes = totalDistractionTime / 60;
+    
+    // If more than 50% of time in hour-long session was distracted, it's bad focus
+    if (sessionMinutes >= 60 && distractionMinutes >= 30) {
+      return 'distracted';
+    }
+    
+    // Calculate distraction percentage
+    const distractionPercentage = sessionDuration > 0 ? (totalDistractionTime / sessionDuration) * 100 : 0;
+    
+    if (distractionPercentage < 10) {
+      return 'attentive';
+    } else if (distractionPercentage < 25) {
+      return 'semi-attentive';
+    } else {
+      return 'distracted';
+    }
   };
 
   const handleStartStudying = (unitIndex: number) => {
@@ -124,78 +185,68 @@ export const StudyTimer: React.FC<StudyTimerProps> = ({
     setSessionTime(0);
     setDistractionLog([]);
     setLastDistractionStart(null);
-    setCurrentUnit(unitIndex);
     onToggleStudying(true);
     
     const session = {
       id: Date.now(),
-      subject: "ai-ml-course",
+      unitIndex,
+      unitTitle: `Unit ${unitIndex + 1}`,
       startTime: now,
-      isActive: true,
-      unitIndex
+      isActive: true
     };
     onSessionChange(session);
 
     toast({
-      title: "AI/ML Study Session Started! 🚀",
+      title: "Study Session Started! 🚀",
       description: "Focus tracking is active. Stay on task!",
     });
   };
 
-  // Save session to localStorage and show rating
-  const saveSessionToLogs = (sessionData: any) => {
-    const savedLogs = localStorage.getItem('studyLogs');
-    const logs = savedLogs ? JSON.parse(savedLogs) : [];
-    
-    const newSession = {
-      id: `session_${Date.now()}`,
-      date: new Date().toISOString().split('T')[0],
-      subject: "AI/ML Course",
-      duration: Math.floor(sessionTime / 60),
-      focusScore: Math.round((sessionData.focusScore || 85) + Math.random() * 10),
-      startTime: startTime?.toTimeString().slice(0, 5) || "00:00",
-      endTime: new Date().toTimeString().slice(0, 5),
-      tabSwitches: sessionData.tabSwitches || 0,
-      distractions: sessionData.distractions || 0,
-      keystrokeRate: sessionData.keystrokeRate || 0,
-      mouseMovements: sessionData.mouseMovements || 0,
-      inactivityPeriods: sessionData.inactivityPeriods || 0,
-      scrollActivity: sessionData.scrollActivity || 0,
-    };
-    
-    logs.push(newSession);
-    localStorage.setItem('studyLogs', JSON.stringify(logs));
-  };
-
   const handleStopStudying = () => {
     try {
-      if (currentSession && sessionTime > 30) { // Lowered minimum time
-        const currentMetrics = mlDataCollection.getCurrentMetrics();
-        const predictedRating = predictFocusLevel(
-          currentMetrics.tabSwitches,
-          sessionTime,
-          distractionLog.length
-        );
+      if (!currentSession || !startTime) return;
 
-        // End ML data collection session with predicted rating
-        const sessionResult = mlDataCollection.endSession(predictedRating);
-        
-        // Save to study logs
-        saveSessionToLogs({
-          tabSwitches: currentMetrics.tabSwitches,
-          distractions: distractionLog.length,
-          keystrokeRate: currentMetrics.keystrokes,
-          mouseMovements: currentMetrics.mouseMovements,
-          inactivityPeriods: currentMetrics.inactivityPeriods,
-          scrollActivity: currentMetrics.scrolls,
-          focusScore: predictedRating === 'attentive' ? 90 : predictedRating === 'semi-attentive' ? 75 : 60
-        });
-        
-        setShowRatingPopup(true);
+      const totalDistractionTime = distractionLog.reduce((total, distraction) => {
+        return total + (distraction.duration || 0);
+      }, 0);
+
+      const sessionData = {
+        unitIndex: currentSession.unitIndex,
+        unitTitle: currentSession.unitTitle,
+        startTime: startTime.toISOString(),
+        endTime: new Date().toISOString(),
+        duration: sessionTime,
+        distractions: distractionLog.length,
+        totalDistractionTime,
+        focusLevel: predictFocusLevel(sessionTime, totalDistractionTime),
+        distractionDetails: distractionLog
+      };
+
+      // Save to localStorage
+      const existingLogs = JSON.parse(localStorage.getItem('studyLogs') || '[]');
+      existingLogs.push(sessionData);
+      localStorage.setItem('studyLogs', JSON.stringify(existingLogs));
+
+      // Update total studied time
+      if (onStudyTimeUpdate) {
+        const today = new Date().toDateString();
+        const currentStudied = parseInt(localStorage.getItem(`studiedToday_${today}`) || '0');
+        const newTotal = currentStudied + Math.floor(sessionTime / 60);
+        onStudyTimeUpdate(newTotal);
       }
+
+      // Collect ML data
+      mlDataCollection.endSession(sessionData.focusLevel);
+
+      // Show rating popup
+      setShowRatingPopup(true);
     } catch (error) {
-      console.log('Error during session end:', error);
-      // Continue with cleanup even if ML data collection fails
+      console.error('Error stopping study session:', error);
+      toast({
+        title: "Session Error",
+        description: "There was an issue saving your session. Please try again.",
+        variant: "destructive",
+      });
     }
     
     onToggleStudying(false);
@@ -208,6 +259,12 @@ export const StudyTimer: React.FC<StudyTimerProps> = ({
     setStartTime(null);
     setDistractionLog([]);
     setLastDistractionStart(null);
+    
+    // Clear localStorage
+    localStorage.removeItem('currentSessionTime');
+    localStorage.removeItem('currentSessionStart');
+    localStorage.removeItem('currentDistractionLog');
+    localStorage.removeItem('lastDistractionStart');
   };
 
   const handleGoToLogs = () => {
@@ -216,6 +273,13 @@ export const StudyTimer: React.FC<StudyTimerProps> = ({
     setStartTime(null);
     setDistractionLog([]);
     setLastDistractionStart(null);
+    
+    // Clear localStorage
+    localStorage.removeItem('currentSessionTime');
+    localStorage.removeItem('currentSessionStart');
+    localStorage.removeItem('currentDistractionLog');
+    localStorage.removeItem('lastDistractionStart');
+    
     onGoToLogs?.();
   };
 
@@ -257,7 +321,7 @@ export const StudyTimer: React.FC<StudyTimerProps> = ({
       <CourseContent 
         isStudying={isStudying} 
         onStartStudying={handleStartStudying}
-        currentUnit={currentUnit}
+        currentUnit={0}
       />
 
       {/* Floating Timer */}
@@ -273,10 +337,11 @@ export const StudyTimer: React.FC<StudyTimerProps> = ({
         isVisible={showRatingPopup}
         sessionTime={sessionTime}
         distractionCount={distractionLog.length}
+        totalDistractionTime={distractionLog.reduce((total, d) => total + (d.duration || 0), 0)}
+        distractionLog={distractionLog}
         predictedRating={predictFocusLevel(
-          mlDataCollection.getCurrentMetrics().tabSwitches,
           sessionTime,
-          distractionLog.length
+          distractionLog.reduce((total, d) => total + (d.duration || 0), 0)
         )}
         onBackToUnits={handleBackToUnits}
         onGoToLogs={handleGoToLogs}

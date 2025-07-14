@@ -14,10 +14,34 @@ import { StudyLogs } from "@/components/StudyLogs";
 const Index = () => {
   const [isStudying, setIsStudying] = useState(false);
   const [currentSession, setCurrentSession] = useState(null);
-  const [dailyGoal, setDailyGoal] = useState(120); // minutes
-  const [studiedToday, setStudiedToday] = useState(45); // minutes
-  const [currentStreak, setCurrentStreak] = useState(3);
+  const [dailyGoal, setDailyGoal] = useState(() => {
+    const saved = localStorage.getItem('studyGoal');
+    return saved ? parseInt(saved) : 120;
+  });
+  const [studiedToday, setStudiedToday] = useState(() => {
+    const today = new Date().toDateString();
+    const saved = localStorage.getItem(`studiedToday_${today}`);
+    return saved ? parseInt(saved) : 0;
+  });
+  const [currentStreak, setCurrentStreak] = useState(() => {
+    const saved = localStorage.getItem('currentStreak');
+    return saved ? parseInt(saved) : 0;
+  });
   const [activeTab, setActiveTab] = useState("study");
+
+  // Persist data changes
+  useEffect(() => {
+    localStorage.setItem('studyGoal', dailyGoal.toString());
+  }, [dailyGoal]);
+
+  useEffect(() => {
+    const today = new Date().toDateString();
+    localStorage.setItem(`studiedToday_${today}`, studiedToday.toString());
+  }, [studiedToday]);
+
+  useEffect(() => {
+    localStorage.setItem('currentStreak', currentStreak.toString());
+  }, [currentStreak]);
 
   const progressPercentage = Math.min((studiedToday / dailyGoal) * 100, 100);
 
@@ -130,19 +154,24 @@ const Index = () => {
         </div>
 
         {/* Main Content Tabs */}
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-5 bg-white shadow-sm">
+        <Tabs value={activeTab} onValueChange={(newTab) => {
+          // Track tab switches as distractions if timer is running
+          if (isStudying && newTab !== activeTab) {
+            const event = new CustomEvent('tabSwitch', { 
+              detail: { 
+                from: activeTab, 
+                to: newTab, 
+                timestamp: Date.now(),
+                type: 'internal_navigation'
+              } 
+            });
+            window.dispatchEvent(event);
+          }
+          setActiveTab(newTab);
+        }} className="space-y-6">
+          <TabsList className="grid w-full grid-cols-2 bg-white shadow-sm">
             <TabsTrigger value="study" className="data-[state=active]:bg-orange-100">
               Study Timer
-            </TabsTrigger>
-            <TabsTrigger value="subjects" className="data-[state=active]:bg-blue-100">
-              Subjects
-            </TabsTrigger>
-            <TabsTrigger value="dashboard" className="data-[state=active]:bg-green-100">
-              Analytics
-            </TabsTrigger>
-            <TabsTrigger value="goals" className="data-[state=active]:bg-purple-100">
-              Goals
             </TabsTrigger>
             <TabsTrigger value="logs" className="data-[state=active]:bg-indigo-100">
               Study Logs
@@ -156,21 +185,7 @@ const Index = () => {
               currentSession={currentSession}
               onSessionChange={setCurrentSession}
               onGoToLogs={handleGoToLogs}
-            />
-          </TabsContent>
-
-          <TabsContent value="subjects" className="space-y-6">
-            <SubjectManager />
-          </TabsContent>
-
-          <TabsContent value="dashboard" className="space-y-6">
-            <ProgressDashboard />
-          </TabsContent>
-
-          <TabsContent value="goals" className="space-y-6">
-            <GoalSetter 
-              currentGoal={dailyGoal}
-              onGoalChange={setDailyGoal}
+              onStudyTimeUpdate={setStudiedToday}
             />
           </TabsContent>
 
