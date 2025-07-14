@@ -55,7 +55,7 @@ export const useMLDataCollection = (isStudying: boolean, subject: string) => {
     }
   }, [isStudying, subject, currentSession]);
 
-  // Track tab visibility changes
+  // Track tab visibility changes and persist data
   useEffect(() => {
     const handleVisibilityChange = () => {
       if (isStudying && document.hidden) {
@@ -67,6 +67,26 @@ export const useMLDataCollection = (isStudying: boolean, subject: string) => {
     document.addEventListener('visibilitychange', handleVisibilityChange);
     return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
   }, [isStudying]);
+
+  // Persist session data to localStorage
+  useEffect(() => {
+    if (sessionData.length > 0) {
+      localStorage.setItem('mlSessionData', JSON.stringify(sessionData));
+    }
+  }, [sessionData]);
+
+  // Load previous session data on mount
+  useEffect(() => {
+    const savedData = localStorage.getItem('mlSessionData');
+    if (savedData) {
+      try {
+        const parsed = JSON.parse(savedData);
+        setSessionData(parsed);
+      } catch (error) {
+        console.log('Error loading saved ML data:', error);
+      }
+    }
+  }, []);
 
   // Track keyboard activity
   useEffect(() => {
@@ -183,7 +203,7 @@ export const useMLDataCollection = (isStudying: boolean, subject: string) => {
     return completedSession;
   };
 
-  // Export data as CSV
+  // Enhanced CSV export for CS student ML project
   const exportToCSV = () => {
     if (sessionData.length === 0) return null;
 
@@ -191,38 +211,59 @@ export const useMLDataCollection = (isStudying: boolean, subject: string) => {
       'session_id',
       'timestamp', 
       'subject',
-      'active_tab_switches',
-      'keystroke_rate', 
-      'mouse_movements',
-      'session_duration',
-      'inactivity_periods',
-      'scroll_activity',
-      'focus_level'
+      'duration_minutes',
+      'tab_switches',
+      'keystroke_rate_per_minute', 
+      'mouse_movements_total',
+      'inactivity_periods_count',
+      'scroll_events_total',
+      'focus_classification',
+      'productivity_score'
     ];
 
     const csvContent = [
+      // Add header comment for Python analysis
+      '# ML Dataset for Student Focus Prediction',
+      '# Generated for CS Engineering Project - Python/NumPy Analysis',
+      '# Features suitable for scikit-learn classification models',
       headers.join(','),
-      ...sessionData.map(row => [
-        row.session_id,
-        row.timestamp,
-        row.subject,
-        row.active_tab_switches,
-        row.keystroke_rate,
-        row.mouse_movements,
-        row.session_duration,
-        row.inactivity_periods,
-        row.scroll_activity,
-        row.focus_level
-      ].join(','))
+      ...sessionData.map(row => {
+        // Calculate productivity score for ML features
+        const productivityScore = Math.round(
+          (row.keystroke_rate * 0.3) + 
+          (row.mouse_movements * 0.2) + 
+          (row.scroll_activity * 0.1) + 
+          ((10 - Math.min(row.active_tab_switches, 10)) * 0.4)
+        );
+        
+        return [
+          row.session_id,
+          row.timestamp,
+          `"${row.subject}"`,
+          row.session_duration,
+          row.active_tab_switches,
+          row.keystroke_rate,
+          row.mouse_movements,
+          row.inactivity_periods,
+          row.scroll_activity,
+          row.focus_level,
+          productivityScore
+        ].join(',');
+      })
     ].join('\n');
 
-    const blob = new Blob([csvContent], { type: 'text/csv' });
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.download = `ml_dataset_${new Date().toISOString().split('T')[0]}.csv`;
+    link.download = `ml_focus_dataset_${new Date().toISOString().split('T')[0]}.csv`;
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
     link.click();
+    document.body.removeChild(link);
     URL.revokeObjectURL(url);
+    
+    return true;
   };
 
   return {

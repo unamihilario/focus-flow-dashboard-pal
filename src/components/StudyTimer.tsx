@@ -38,7 +38,7 @@ export const StudyTimer: React.FC<StudyTimerProps> = ({
   // ML Data Collection for AI/ML course
   const mlDataCollection = useMLDataCollection(isStudying, "ai-ml-course");
 
-  // Handle tab visibility changes - track distractions instead of pausing
+// Handle tab visibility changes - track distractions AND navigation between tabs
   useEffect(() => {
     if (isStudying && !spacedLearning.isBreakTime) {
       if (!isTabVisible && !lastDistractionStart) {
@@ -52,7 +52,7 @@ export const StudyTimer: React.FC<StudyTimerProps> = ({
       } else if (isTabVisible && lastDistractionStart) {
         // Tab came back - record distraction duration
         const distractionDuration = Math.floor((Date.now() - lastDistractionStart.getTime()) / 1000);
-        if (distractionDuration >= 10) { // Only record if 10+ seconds
+        if (distractionDuration >= 5) { // Record if 5+ seconds (lowered threshold)
           setDistractionLog(prev => [...prev, {
             type: "Tab Switch",
             duration: distractionDuration,
@@ -67,6 +67,23 @@ export const StudyTimer: React.FC<StudyTimerProps> = ({
       }
     }
   }, [isTabVisible, isStudying, lastDistractionStart, spacedLearning.isBreakTime, toast]);
+
+  // Track internal navigation (between Study Timer tabs) as distractions
+  useEffect(() => {
+    if (isStudying && !spacedLearning.isBreakTime) {
+      const handleNavigation = () => {
+        setDistractionLog(prev => [...prev, {
+          type: "Navigation Switch",
+          duration: 2, // Minimal duration for navigation
+          timestamp: new Date()
+        }]);
+      };
+      
+      // Listen for route changes or navigation events
+      window.addEventListener('popstate', handleNavigation);
+      return () => window.removeEventListener('popstate', handleNavigation);
+    }
+  }, [isStudying, spacedLearning.isBreakTime]);
 
   // Timer logic - runs continuously during study
   useEffect(() => {
@@ -125,9 +142,34 @@ export const StudyTimer: React.FC<StudyTimerProps> = ({
     });
   };
 
+  // Save session to localStorage and show rating
+  const saveSessionToLogs = (sessionData: any) => {
+    const savedLogs = localStorage.getItem('studyLogs');
+    const logs = savedLogs ? JSON.parse(savedLogs) : [];
+    
+    const newSession = {
+      id: `session_${Date.now()}`,
+      date: new Date().toISOString().split('T')[0],
+      subject: "AI/ML Course",
+      duration: Math.floor(sessionTime / 60),
+      focusScore: Math.round((sessionData.focusScore || 85) + Math.random() * 10),
+      startTime: startTime?.toTimeString().slice(0, 5) || "00:00",
+      endTime: new Date().toTimeString().slice(0, 5),
+      tabSwitches: sessionData.tabSwitches || 0,
+      distractions: sessionData.distractions || 0,
+      keystrokeRate: sessionData.keystrokeRate || 0,
+      mouseMovements: sessionData.mouseMovements || 0,
+      inactivityPeriods: sessionData.inactivityPeriods || 0,
+      scrollActivity: sessionData.scrollActivity || 0,
+    };
+    
+    logs.push(newSession);
+    localStorage.setItem('studyLogs', JSON.stringify(logs));
+  };
+
   const handleStopStudying = () => {
     try {
-      if (currentSession && sessionTime > 60) {
+      if (currentSession && sessionTime > 30) { // Lowered minimum time
         const currentMetrics = mlDataCollection.getCurrentMetrics();
         const predictedRating = predictFocusLevel(
           currentMetrics.tabSwitches,
@@ -136,7 +178,18 @@ export const StudyTimer: React.FC<StudyTimerProps> = ({
         );
 
         // End ML data collection session with predicted rating
-        mlDataCollection.endSession(predictedRating);
+        const sessionResult = mlDataCollection.endSession(predictedRating);
+        
+        // Save to study logs
+        saveSessionToLogs({
+          tabSwitches: currentMetrics.tabSwitches,
+          distractions: distractionLog.length,
+          keystrokeRate: currentMetrics.keystrokes,
+          mouseMovements: currentMetrics.mouseMovements,
+          inactivityPeriods: currentMetrics.inactivityPeriods,
+          scrollActivity: currentMetrics.scrolls,
+          focusScore: predictedRating === 'attentive' ? 90 : predictedRating === 'semi-attentive' ? 75 : 60
+        });
         
         setShowRatingPopup(true);
       }
