@@ -159,24 +159,22 @@ export const StudyTimer: React.FC<StudyTimerProps> = ({
     return () => clearInterval(interval);
   }, [isStudying, startTime, spacedLearning]);
 
-  const predictFocusLevel = (sessionDuration: number, totalDistractionTime: number): 'attentive' | 'semi-attentive' | 'distracted' => {
-    const sessionMinutes = sessionDuration / 60;
-    const distractionMinutes = totalDistractionTime / 60;
+  const predictFocusLevel = (
+    sessionDuration: number, 
+    totalDistractionTime: number, 
+    keystrokeRate: number = 0, 
+    scrollActivity: number = 0
+  ): 'attentive' | 'semi-attentive' | 'distracted' => {
+    // Calculate distraction ratio (in seconds)
+    const distractionRatio = sessionDuration > 0 ? totalDistractionTime / sessionDuration : 0;
     
-    // If more than 50% of time in hour-long session was distracted, it's bad focus
-    if (sessionMinutes >= 60 && distractionMinutes >= 30) {
-      return 'distracted';
-    }
-    
-    // Calculate distraction percentage
-    const distractionPercentage = sessionDuration > 0 ? (totalDistractionTime / sessionDuration) * 100 : 0;
-    
-    if (distractionPercentage < 10) {
+    // Classification thresholds based on provided criteria
+    if (distractionRatio < 0.2 && keystrokeRate >= 10 && scrollActivity >= 20) {
       return 'attentive';
-    } else if (distractionPercentage < 25) {
-      return 'semi-attentive';
-    } else {
+    } else if (distractionRatio > 0.5 || (keystrokeRate < 4 && scrollActivity < 8)) {
       return 'distracted';
+    } else {
+      return 'semi-attentive';
     }
   };
 
@@ -207,9 +205,10 @@ export const StudyTimer: React.FC<StudyTimerProps> = ({
     try {
       if (!currentSession || !startTime) return;
 
-      const totalDistractionTime = distractionLog.reduce((total, distraction) => {
+      // Calculate total distraction time in seconds (not milliseconds)
+      const totalDistractionTime = Math.floor(distractionLog.reduce((total, distraction) => {
         return total + (distraction.duration || 0);
-      }, 0);
+      }, 0) / 1000);
 
       const mlMetrics = mlDataCollection.getCurrentMetrics();
       
@@ -221,7 +220,7 @@ export const StudyTimer: React.FC<StudyTimerProps> = ({
         duration: sessionTime,
         distractions: distractionLog.length,
         totalDistractionTime,
-        focusLevel: predictFocusLevel(sessionTime, totalDistractionTime),
+        focusLevel: predictFocusLevel(sessionTime, totalDistractionTime, mlMetrics.keystrokes, mlMetrics.scrolls),
         distractionDetails: distractionLog.map(d => ({
           ...d,
           timeFromStart: d.timestamp - startTime.getTime()
@@ -341,7 +340,7 @@ export const StudyTimer: React.FC<StudyTimerProps> = ({
       <FocusScoreOverlay
         sessionTime={sessionTime}
         distractionCount={distractionLog.length}
-        totalDistractionTime={distractionLog.reduce((total, d) => total + (d.duration || 0), 0)}
+        totalDistractionTime={Math.floor(distractionLog.reduce((total, d) => total + (d.duration || 0), 0) / 1000)}
         isVisible={isStudying}
         keystrokeRate={mlDataCollection.getCurrentMetrics().keystrokes}
         mouseMovements={mlDataCollection.getCurrentMetrics().mouseMovements}
@@ -361,14 +360,16 @@ export const StudyTimer: React.FC<StudyTimerProps> = ({
         isVisible={showRatingPopup}
         sessionTime={sessionTime}
         distractionCount={distractionLog.length}
-        totalDistractionTime={distractionLog.reduce((total, d) => total + (d.duration || 0), 0)}
+        totalDistractionTime={Math.floor(distractionLog.reduce((total, d) => total + (d.duration || 0), 0) / 1000)}
         distractionLog={distractionLog.map(d => ({
           ...d,
           timeFromStart: startTime ? d.timestamp - startTime.getTime() : 0
         }))}
         predictedRating={predictFocusLevel(
           sessionTime,
-          distractionLog.reduce((total, d) => total + (d.duration || 0), 0)
+          Math.floor(distractionLog.reduce((total, d) => total + (d.duration || 0), 0) / 1000),
+          mlDataCollection.getCurrentMetrics().keystrokes,
+          mlDataCollection.getCurrentMetrics().scrolls
         )}
         onBackToUnits={handleBackToUnits}
         onGoToLogs={handleGoToLogs}

@@ -191,7 +191,11 @@ print(f"Model accuracy: {score}")
           <CardContent className="p-6">
             <div className="prose prose-blue max-w-none">
               <div className="whitespace-pre-line text-gray-800 leading-relaxed">
-                {material.content}
+                {material.content
+                  .replace(/^#{1,6}\s+/gm, '')  // Remove # ## ### etc
+                  .replace(/\*\*(.*?)\*\*/g, '$1')  // Remove **bold**
+                  .replace(/\*(.*?)\*/g, '$1')  // Remove *italic*
+                }
               </div>
             </div>
           </CardContent>
