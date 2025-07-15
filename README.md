@@ -1,22 +1,27 @@
-# StudySaver - ML-Powered Focus Analytics
+StudySaver - ML-Powered Focus Analytics
+🎓 CS Engineering Project: Machine Learning Study Behavior Analysis
 
-🎓 **CS Engineering Project**: Machine Learning Study Behavior Analysis
+Overview
+StudySaver is a real-time study session tracker designed to collect behavioral data for machine learning analysis. It predicts focus levels based on user interaction patterns and exports structured datasets optimized for Python-based model training using libraries such as scikit-learn and pandas.
 
-## Overview
-StudySaver is a real-time study session tracker that collects behavioral data for machine learning analysis. It predicts focus levels based on user interaction patterns and exports structured datasets for Python/scikit-learn model training.
+🔬 ML Data Collection Features
+Real-Time Metrics Tracked
+Session data is recorded in-browser and includes:
 
-## 🔬 ML Data Collection Features
+Session Duration – total active time in minutes
 
-### Real-Time Metrics Tracked:
-- **Session Duration** (minutes)
-- **Tab Switch Duration** (accumulated time away from study tab)
-- **Keystroke Rate** (keystrokes per minute)
-- **Mouse Movements** (total interaction count)
-- **Scroll Activity** (scroll events tracked)
-- **Inactivity Periods** (count + duration of idle time)
+Tab Switch Duration – accumulated time spent away from the study tab
 
-### 🎯 Focus Classification Algorithm:
-```python
+Keystroke Rate – number of keystrokes per minute
+
+Mouse Movements – total user interaction via mouse
+
+Scroll Activity – number of scroll events
+
+Inactivity Periods – count and duration of idle intervals
+
+🎯 Focus Classification Algorithm
+python
 # Distraction Ratio Formula
 distraction_ratio = tab_switch_duration_total / session_duration
 
@@ -24,81 +29,83 @@ distraction_ratio = tab_switch_duration_total / session_duration
 # 🟢 Attentive: distraction_ratio < 0.2 AND keystroke_rate ≥ 10 AND scroll_activity ≥ 20
 # 🟡 Semi-Attentive: 0.2 ≤ distraction_ratio ≤ 0.5 OR medium engagement
 # 🔴 Distracted: distraction_ratio > 0.5 OR low interaction metrics
-```
+This logic helps label sessions using non-optical cues, allowing scalable focus prediction without camera-based tracking.
 
-## 📊 Dataset Export
-- **CSV Format**: Ready for pandas/NumPy analysis
-- **Feature Engineering**: Productivity scores and distraction ratios pre-calculated
-- **ML-Ready Headers**: Compatible with scikit-learn classification models
+📊 Dataset Export
+StudySaver exports behavioral metrics in a structured CSV format, ready for Python-based ML workflows. Pre-calculated features such as productivity score and distraction ratio streamline feature engineering. The dataset headers are fully compatible with classification algorithms from scikit-learn.
 
-## 🐍 Python Analysis Pipeline
-The exported dataset includes features suitable for:
-- **Classification Models**: Random Forest, Decision Tree, SVM
-- **Prediction Tasks**: "Will this session be distracted?"
-- **Feature Importance**: Which behaviors best predict focus levels?
+🐍 Python Analysis Pipeline
+Exported datasets are tailored for training models like Random Forests, Decision Trees, or SVMs. These models predict session focus levels and evaluate which behaviors most strongly correlate with distraction or attention.
 
-### Sample Python Analysis:
-```python
+Sample Python Analysis
+python
 import pandas as pd
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import train_test_split
 
-# Load exported dataset
 df = pd.read_csv('ml_focus_dataset_YYYY-MM-DD.csv')
 
-# Features for classification
 features = ['duration_minutes', 'tab_switches', 'keystroke_rate_per_minute', 
-           'mouse_movements_total', 'scroll_events_total', 'productivity_score']
+            'mouse_movements_total', 'scroll_events_total', 'productivity_score']
 
 X = df[features]
 y = df['focus_classification']
 
-# Train model
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
 model = RandomForestClassifier()
 model.fit(X_train, y_train)
 
-# Feature importance analysis
 print("Feature Importance:", model.feature_importances_)
-```
+🚀 Getting Started
+Start Study Session – Launch tracker and select study material
 
-## 🚀 Getting Started
+Study Naturally – Behavioral data is collected in the background
 
-1. **Start Study Session**: Select course material and begin tracking
-2. **Study Naturally**: System collects behavioral data in background
-3. **Review Focus Score**: Get real-time feedback on attention levels
-4. **Export Dataset**: Download CSV for ML analysis in Python
-5. **Train Models**: Use exported data for focus prediction algorithms
+Review Focus Score – Receive feedback post-session
 
-## 📈 Key Metrics Dashboard
-- **Real-time Focus Meter**: Live percentage based on current behavior
-- **Distraction Timeline**: Visual chart of attention dips during session
-- **Session Summary**: Post-study analysis with improvement suggestions
-- **Weekly Analytics**: Trends in focus scores and study consistency
+Export Dataset – Download CSV for further analysis
 
-## 🎯 Project Goals
-This system demonstrates:
-- **Data Pipeline**: Real-time collection → feature engineering → ML-ready export
-- **Predictive Analytics**: Behavioral patterns → focus level classification
-- **User Experience**: Actionable insights for study improvement
-- **Technical Implementation**: React frontend + ML data structure design
+Train Models – Use the exported file in Python to generate predictions
 
-## 🔧 Technical Stack
-- **Frontend**: React + TypeScript + Tailwind CSS
-- **Data Collection**: Real-time browser event tracking
-- **Storage**: LocalStorage with structured data persistence
-- **Export**: CSV format optimized for Python/pandas
-- **ML Integration**: Feature-engineered dataset ready for scikit-learn
+📈 Key Metrics Dashboard
+The UI includes:
 
----
+Focus Meter – real-time score based on current behavior
 
-## Development Setup
+Distraction Timeline – visual graph of attention dips
 
-### Requirements
-- Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+Session Summary – post-session analysis with improvement hints
 
-### Steps
-```bash
+Weekly Analytics – aggregate tracking of study consistency and focus trends
+
+🎯 Project Goals
+StudySaver demonstrates:
+
+A real-time data pipeline for behavioral tracking
+
+Predictive modeling from browser interaction metrics
+
+User-focused design for actionable study feedback
+
+A complete technical implementation combining frontend tracking and backend ML analysis
+
+🔧 Technical Stack
+Frontend: React, TypeScript, Tailwind CSS
+
+Data Collection: Custom React Hooks for browser event tracking
+
+Storage: localStorage for persistent session data
+
+Export Format: CSV files compatible with pandas
+
+ML Tools: Python, NumPy, scikit-learn
+
+Development Setup
+Requirements
+Node.js and npm Install via nvm →
+
+Steps
+bash
 # Clone the repository
 git clone <YOUR_GIT_URL>
 
@@ -110,17 +117,16 @@ npm i
 
 # Start development server
 npm run dev
-```
+Technologies Used
+Vite – fast dev server and build tool
 
-### Technologies Used
-- **Vite** - Build tool and dev server
-- **TypeScript** - Type safety and development experience
-- **React** - UI framework
-- **shadcn-ui** - Component library
-- **Tailwind CSS** - Styling framework
+TypeScript – type-safe development
 
-### Deployment
-Deploy directly via: https://lovable.dev/projects/38d61cb0-e7f9-4ba6-b9ef-0c9f5917c9ea
+React – UI rendering framework
 
----
-**Note**: This project focuses on the data collection and feature engineering pipeline. The exported CSV files are designed for seamless integration with Python ML workflows using pandas, NumPy, and scikit-learn.
+shadcn-ui – accessible component library
+
+Tailwind CSS – utility-first styling
+
+Deployment
+Live version hosted at: 
