@@ -116,7 +116,8 @@ npm run dev
 - **GitHub**: [focus-flow-dashboard-pal](https://github.com/unamihilario/focus-flow-dashboard-pal)  
 - **Project Report (.docx)**: `12322069AIMLReport.docx`  
 - **Dataset (.csv)**: `ml_focus_dataset_2025-07-15.csv`  
-- **Python Script**: `focus_predictor.py`  
+- - **ML Evaluation Script**: [focus_model.py](https://github.com/unamihilario/focus-flow-dashboard-pal/blob/main/focus_model.py)  
+  Includes model training, classification metrics, heatmaps, feature importance, and prediction export. 
 
 ---
 
