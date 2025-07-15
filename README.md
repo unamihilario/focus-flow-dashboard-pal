@@ -1,53 +1,63 @@
-StudySaver - ML-Powered Focus Analytics
-🎓 CS Engineering Project: Machine Learning Study Behavior Analysis
+Absolutely, Hilario. Here's a clean and professional version of your project overview for **StudySaver - ML-Powered Focus Analytics** that’s easy to read and presentation-ready:
 
-Overview
-StudySaver is a real-time study session tracker designed to collect behavioral data for machine learning analysis. It predicts focus levels based on user interaction patterns and exports structured datasets optimized for Python-based model training using libraries such as scikit-learn and pandas.
+---
 
-🔬 ML Data Collection Features
-Real-Time Metrics Tracked
-Session data is recorded in-browser and includes:
+# 🎓 StudySaver: ML-Powered Focus Analytics  
+**CS Engineering Project – Machine Learning Study Behavior Analysis**
 
-Session Duration – total active time in minutes
+---
 
-Tab Switch Duration – accumulated time spent away from the study tab
+## 📌 Overview  
+**StudySaver** is a real-time study session tracker that captures behavioral data from user interactions to predict focus levels using machine learning. It outputs structured datasets for seamless integration with Python-based tools like **scikit-learn** and **pandas**.
 
-Keystroke Rate – number of keystrokes per minute
+---
 
-Mouse Movements – total user interaction via mouse
+## 🔬 ML Data Collection Features  
+Session metrics are recorded directly in-browser:
 
-Scroll Activity – number of scroll events
+| Metric | Description |
+|-------|-------------|
+| **Session Duration** | Total active time in minutes |
+| **Tab Switch Duration** | Accumulated time away from study tab |
+| **Keystroke Rate** | Keystrokes per minute |
+| **Mouse Movements** | Total mouse interactions |
+| **Scroll Activity** | Number of scroll events |
+| **Inactivity Periods** | Count & duration of idle intervals |
 
-Inactivity Periods – count and duration of idle intervals
+---
 
-🎯 Focus Classification Algorithm
-python
-# Distraction Ratio Formula
+## 🎯 Focus Classification Logic  
+Custom classification based on behavioral cues—no camera needed.
+
+```python
 distraction_ratio = tab_switch_duration_total / session_duration
+```
 
-# Classification Thresholds:
-# 🟢 Attentive: distraction_ratio < 0.2 AND keystroke_rate ≥ 10 AND scroll_activity ≥ 20
-# 🟡 Semi-Attentive: 0.2 ≤ distraction_ratio ≤ 0.5 OR medium engagement
-# 🔴 Distracted: distraction_ratio > 0.5 OR low interaction metrics
-This logic helps label sessions using non-optical cues, allowing scalable focus prediction without camera-based tracking.
+| Classification | Conditions |
+|----------------|------------|
+| 🟢 **Attentive** | distraction_ratio < 0.2 and keystroke_rate ≥ 10 and scroll_activity ≥ 20 |
+| 🟡 **Semi-Attentive** | distraction_ratio between 0.2–0.5 or medium interaction |
+| 🔴 **Distracted** | distraction_ratio > 0.5 or low activity |
 
-📊 Dataset Export
-StudySaver exports behavioral metrics in a structured CSV format, ready for Python-based ML workflows. Pre-calculated features such as productivity score and distraction ratio streamline feature engineering. The dataset headers are fully compatible with classification algorithms from scikit-learn.
+---
 
-🐍 Python Analysis Pipeline
-Exported datasets are tailored for training models like Random Forests, Decision Trees, or SVMs. These models predict session focus levels and evaluate which behaviors most strongly correlate with distraction or attention.
+## 📊 Dataset Export  
+- Exports structured **CSV** datasets
+- Pre-computed features: `productivity_score`, `distraction_ratio`
+- Ready for ML model training with **pandas** and **scikit-learn**
 
-Sample Python Analysis
-python
+---
+
+## 🐍 Python ML Pipeline Example  
+```python
 import pandas as pd
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import train_test_split
 
 df = pd.read_csv('ml_focus_dataset_YYYY-MM-DD.csv')
 
-features = ['duration_minutes', 'tab_switches', 'keystroke_rate_per_minute', 
+features = ['duration_minutes', 'tab_switches', 'keystroke_rate_per_minute',
             'mouse_movements_total', 'scroll_events_total', 'productivity_score']
-
 X = df[features]
 y = df['focus_classification']
 
@@ -56,84 +66,58 @@ model = RandomForestClassifier()
 model.fit(X_train, y_train)
 
 print("Feature Importance:", model.feature_importances_)
-🚀 Getting Started
-Start Study Session – Launch tracker and select study material
+```
 
-Study Naturally – Behavioral data is collected in the background
+---
 
-Review Focus Score – Receive feedback post-session
+## 🚀 How to Get Started  
+1. **Start Tracker** – Choose study material  
+2. **Study Naturally** – Data collected in background  
+3. **Review Results** – Post-session feedback  
+4. **Export Dataset** – Analyze in Python  
+5. **Train Models** – Build custom predictors
 
-Export Dataset – Download CSV for further analysis
+---
 
-Train Models – Use the exported file in Python to generate predictions
+## 📈 UI Dashboard Highlights  
+- **Focus Meter** – Real-time attention score  
+- **Distraction Timeline** – Graph of dips in focus  
+- **Session Summary** – Insights & feedback  
+- **Weekly Analytics** – Trends in study consistency
 
-📈 Key Metrics Dashboard
-The UI includes:
+---
 
-Focus Meter – real-time score based on current behavior
+## 🧠 Project Objectives  
+- Real-time behavioral tracking  
+- Predictive modeling from browser interactions  
+- Actionable student feedback  
+- Full-stack implementation: React + ML integration
 
-Distraction Timeline – visual graph of attention dips
+---
 
-Session Summary – post-session analysis with improvement hints
-
-Weekly Analytics – aggregate tracking of study consistency and focus trends
-
-🎯 Project Goals
-StudySaver demonstrates:
-
-A real-time data pipeline for behavioral tracking
-
-Predictive modeling from browser interaction metrics
-
-User-focused design for actionable study feedback
-
-A complete technical implementation combining frontend tracking and backend ML analysis
-
-🔧 Technical Stack
-Frontend: React, TypeScript, Tailwind CSS
-
-Data Collection: Custom React Hooks for browser event tracking
-
-Storage: localStorage for persistent session data
-
-Export Format: CSV files compatible with pandas
-
-ML Tools: Python, NumPy, scikit-learn
-
-Development Setup
-Requirements
-Node.js and npm Install via nvm →
-
-Steps
-bash
-# Clone the repository
+## 🔧 Tech Stack  
+- **Frontend**: React, TypeScript, Tailwind CSS  
+- **Tracking**: Custom Hooks for browser events  
+- **Storage**: localStorage  
+- **Export Format**: CSV for pandas  
+- **ML Tools**: Python, NumPy, scikit-learn  
+- **Dev Setup**:
+```bash
 git clone <YOUR_GIT_URL>
-
-# Navigate to project directory
 cd <YOUR_PROJECT_NAME>
-
-# Install dependencies
 npm i
-
-# Start development server
 npm run dev
-Technologies Used
-Vite – fast dev server and build tool
+```
 
-TypeScript – type-safe development
+---
 
-React – UI rendering framework
+## 🌐 Links  
+- **Live Dashboard**: [focus-flow-dashboard-pal.vercel.app](https://focus-flow-dashboard-pal.vercel.app/)  
+- **GitHub**: [focus-flow-dashboard-pal](https://github.com/unamihilario/focus-flow-dashboard-pal)  
+- **Project Report (.docx)**: `12322069AIMLReport.docx`  
+- **Dataset (.csv)**: `ml_focus_dataset_2025-07-15.csv`  
+- **Python Script**: `focus_predictor.py`  
 
-shadcn-ui – accessible component library
+---
 
-Tailwind CSS – utility-first styling
-
-Deployment
-Live version hosted at: https://focus-flow-dashboard-pal.vercel.app/
-
-- GitHub Repository**: [https://github.com/unamihilario/focus-flow-dashboard-pal](https://github.com/unamihilario/focus-flow-dashboard-pal)  
-- Project Report (.docx)**: [Link to `12322069AIMLReport.docx`](https://github.com/unamihilario/focus-flow-dashboard-pal/blob/main/12322069AIMLReport.docx)  
-- Dataset File (.csv)**: [Link to `ml_focus_dataset_2025-07-15.csv`](https://github.com/unamihilario/focus-flow-dashboard-pal/blob/main/ml_focus_dataset_2025-07-15.csv)  
-- Python Model Script**: [Link to `focus_predictor.py`](https://github.com/unamihilario/focus-flow-dashboard-pal/blob/main/focus_predictor.py)  
-- Deployment Link**: [Your live dashboard here](`[paste your updated Netlify or custom domain link](https://focus-flow-dashboard-pal.vercel.app/)`)
-
+If you want this formatted as an actual webpage or printable document, I can help you convert it to HTML or Markdown too. Want that next?
