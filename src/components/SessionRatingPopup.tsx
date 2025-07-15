@@ -14,6 +14,7 @@ interface SessionRatingPopupProps {
     type: 'tab_switch' | 'navigation' | 'internal_navigation';
     timestamp: number;
     duration?: number;
+    timeFromStart?: number;
   }>;
   predictedRating: 'attentive' | 'semi-attentive' | 'distracted';
   onBackToUnits: () => void;
@@ -112,26 +113,41 @@ export const SessionRatingPopup: React.FC<SessionRatingPopupProps> = ({
                 <span className="font-medium">{formatTime(totalDistractionTime)}</span>
               </div>
               <div className="flex justify-between text-sm">
-                <span className="text-gray-600">Focus Percentage:</span>
+                <span className="text-gray-600">Focused Time:</span>
                 <span className="font-medium">
-                  {sessionTime > 0 ? Math.round(((sessionTime - totalDistractionTime) / sessionTime) * 100) : 0}%
+                  {formatTime(Math.max(0, sessionTime - totalDistractionTime))}
                 </span>
               </div>
             </div>
             
             {distractionLog.length > 0 && (
               <div className="border-t pt-3">
-                <p className="text-xs font-medium text-gray-700 mb-2">Distraction Details:</p>
-                <div className="space-y-1 max-h-24 overflow-y-auto">
+                <p className="text-xs font-medium text-gray-700 mb-2">Distraction Timeline:</p>
+                <div className="space-y-1 max-h-32 overflow-y-auto">
                   {distractionLog.map((distraction, index) => (
-                    <div key={index} className="text-xs text-gray-600 flex justify-between">
-                      <span>
-                        {distraction.type === 'tab_switch' ? '🔄 Tab Switch' : 
-                         distraction.type === 'internal_navigation' ? '📱 Page Switch' : '🔗 Navigation'}
+                    <div key={index} className="text-xs text-gray-600 flex justify-between items-center">
+                      <span className="flex items-center space-x-2">
+                        <span>
+                          {distraction.type === 'tab_switch' ? '🔄' : 
+                           distraction.type === 'internal_navigation' ? '📱' : '🔗'}
+                        </span>
+                        <span>
+                          {distraction.type === 'tab_switch' ? 'Tab Switch' : 
+                           distraction.type === 'internal_navigation' ? 'Page Switch' : 'Navigation'}
+                        </span>
                       </span>
-                      <span>{distraction.duration ? formatTime(distraction.duration / 1000) : '-'}</span>
+                      <div className="text-right">
+                        <div>{distraction.timeFromStart ? `+${formatTime(distraction.timeFromStart / 1000)}` : '-'}</div>
+                        <div className="text-gray-500">
+                          {distraction.duration ? `(${formatTime(distraction.duration / 1000)})` : ''}
+                        </div>
+                      </div>
                     </div>
                   ))}
+                </div>
+                <div className="mt-2 text-xs text-blue-600">
+                  You were focused {sessionTime > 0 ? Math.round(((sessionTime - totalDistractionTime) / sessionTime) * 100) : 0}% of the time. 
+                  {((sessionTime - totalDistractionTime) / sessionTime) >= 0.78 ? ' Great job!' : ' Keep improving!'}
                 </div>
               </div>
             )}

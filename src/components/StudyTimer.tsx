@@ -3,8 +3,9 @@ import { useToast } from "@/hooks/use-toast";
 import { useTabVisibility } from "@/hooks/useTabVisibility";
 import { useSpacedLearning } from "@/hooks/useSpacedLearning";
 import { useMLDataCollection } from "@/hooks/useMLDataCollection";
-import { CourseContent } from "@/components/CourseContent";
+import { CourseManager } from "@/components/CourseManager";
 import { FloatingTimer } from "@/components/FloatingTimer";
+import { FocusScoreOverlay } from "@/components/FocusScoreOverlay";
 import { SessionRatingPopup } from "@/components/SessionRatingPopup";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -179,7 +180,7 @@ export const StudyTimer: React.FC<StudyTimerProps> = ({
     }
   };
 
-  const handleStartStudying = (unitIndex: number) => {
+  const handleStartStudying = (courseId: string, materialId: string) => {
     const now = new Date();
     setStartTime(now);
     setSessionTime(0);
@@ -189,8 +190,8 @@ export const StudyTimer: React.FC<StudyTimerProps> = ({
     
     const session = {
       id: Date.now(),
-      unitIndex,
-      unitTitle: `Unit ${unitIndex + 1}`,
+      courseId,
+      materialId,
       startTime: now,
       isActive: true
     };
@@ -210,16 +211,27 @@ export const StudyTimer: React.FC<StudyTimerProps> = ({
         return total + (distraction.duration || 0);
       }, 0);
 
+      const mlMetrics = mlDataCollection.getCurrentMetrics();
+      
       const sessionData = {
-        unitIndex: currentSession.unitIndex,
-        unitTitle: currentSession.unitTitle,
+        courseId: currentSession.courseId,
+        materialId: currentSession.materialId,
         startTime: startTime.toISOString(),
         endTime: new Date().toISOString(),
         duration: sessionTime,
         distractions: distractionLog.length,
         totalDistractionTime,
         focusLevel: predictFocusLevel(sessionTime, totalDistractionTime),
-        distractionDetails: distractionLog
+        distractionDetails: distractionLog.map(d => ({
+          ...d,
+          timeFromStart: d.timestamp - startTime.getTime()
+        })),
+        // Enhanced metrics for ML analysis
+        keystrokeRate: mlMetrics.keystrokes,
+        mouseMovements: mlMetrics.mouseMovements,
+        scrollActivity: mlMetrics.scrolls,
+        tabSwitches: mlMetrics.tabSwitches,
+        inactivityPeriods: mlMetrics.inactivityPeriods
       };
 
       // Save to localStorage
@@ -318,10 +330,22 @@ export const StudyTimer: React.FC<StudyTimerProps> = ({
   return (
     <div className="space-y-6">
       {/* Course Content */}
-      <CourseContent 
+      <CourseManager 
         isStudying={isStudying} 
         onStartStudying={handleStartStudying}
-        currentUnit={0}
+        selectedCourse={currentSession?.courseId}
+        selectedMaterial={currentSession?.materialId}
+      />
+
+      {/* Real-time Focus Score Overlay */}
+      <FocusScoreOverlay
+        sessionTime={sessionTime}
+        distractionCount={distractionLog.length}
+        totalDistractionTime={distractionLog.reduce((total, d) => total + (d.duration || 0), 0)}
+        isVisible={isStudying}
+        keystrokeRate={mlDataCollection.getCurrentMetrics().keystrokes}
+        mouseMovements={mlDataCollection.getCurrentMetrics().mouseMovements}
+        scrollActivity={mlDataCollection.getCurrentMetrics().scrolls}
       />
 
       {/* Floating Timer */}
@@ -338,7 +362,10 @@ export const StudyTimer: React.FC<StudyTimerProps> = ({
         sessionTime={sessionTime}
         distractionCount={distractionLog.length}
         totalDistractionTime={distractionLog.reduce((total, d) => total + (d.duration || 0), 0)}
-        distractionLog={distractionLog}
+        distractionLog={distractionLog.map(d => ({
+          ...d,
+          timeFromStart: startTime ? d.timestamp - startTime.getTime() : 0
+        }))}
         predictedRating={predictFocusLevel(
           sessionTime,
           distractionLog.reduce((total, d) => total + (d.duration || 0), 0)

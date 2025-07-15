@@ -32,7 +32,7 @@ export const FloatingTimer: React.FC<FloatingTimerProps> = ({
   if (!isVisible) return null;
 
   return (
-    <div className="fixed bottom-4 right-4 z-40">
+    <div className="fixed bottom-20 right-4 z-40">
       <Card className="bg-white shadow-2xl border-2 border-blue-200 min-w-[200px]">
         <CardContent className="p-4">
           <div className="flex items-center justify-between mb-2">
