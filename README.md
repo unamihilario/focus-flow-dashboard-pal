@@ -129,4 +129,4 @@ shadcn-ui – accessible component library
 Tailwind CSS – utility-first styling
 
 Deployment
-Live version hosted at: 
+Live version hosted at: https://focus-flow-dashboard-pal.vercel.app/
