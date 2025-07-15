@@ -36,7 +36,14 @@ export const CourseManager: React.FC<CourseManagerProps> = ({
   const [courses, setCourses] = useState<Course[]>(() => {
     const saved = localStorage.getItem('studyAppCourses');
     if (saved) {
-      return JSON.parse(saved);
+      const parsed = JSON.parse(saved);
+      return parsed.map((course: Course) => ({
+        ...course,
+        materials: course.materials.map(material => ({
+          ...material,
+          uploadDate: new Date(material.uploadDate)
+        }))
+      }));
     }
     return [{
       id: 'ml-course',
