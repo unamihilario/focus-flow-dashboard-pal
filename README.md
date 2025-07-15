@@ -130,3 +130,10 @@ Tailwind CSS – utility-first styling
 
 Deployment
 Live version hosted at: https://focus-flow-dashboard-pal.vercel.app/
+
+- GitHub Repository**: [https://github.com/unamihilario/focus-flow-dashboard-pal](https://github.com/unamihilario/focus-flow-dashboard-pal)  
+- Project Report (.docx)**: [Link to `12322069AIMLReport.docx`](https://github.com/unamihilario/focus-flow-dashboard-pal/blob/main/12322069AIMLReport.docx)  
+- Dataset File (.csv)**: [Link to `ml_focus_dataset_2025-07-15.csv`](https://github.com/unamihilario/focus-flow-dashboard-pal/blob/main/ml_focus_dataset_2025-07-15.csv)  
+- Python Model Script**: [Link to `focus_predictor.py`](https://github.com/unamihilario/focus-flow-dashboard-pal/blob/main/focus_predictor.py)  
+- Deployment Link**: [Your live dashboard here](`[paste your updated Netlify or custom domain link](https://focus-flow-dashboard-pal.vercel.app/)`)
+
