@@ -4,8 +4,11 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Download, Calendar, Filter, Database, Eye, Brain } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { MLDataCollector } from "@/components/MLDataCollector";
+import { PythonAnalysisGuide } from "@/components/PythonAnalysisGuide";
 import { useMLDataCollection } from "@/hooks/useMLDataCollection";
 
 interface StudySession {
@@ -205,7 +208,7 @@ export const StudyLogs = () => {
   };
 
   return (
-    <div className="space-y-6">
+    <Tabs defaultValue="sessions" className="space-y-6">
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
@@ -240,6 +243,13 @@ export const StudyLogs = () => {
         </div>
       </div>
 
+      <TabsList className="grid w-full grid-cols-3">
+        <TabsTrigger value="sessions">Study Sessions</TabsTrigger>
+        <TabsTrigger value="analytics">Analytics Dashboard</TabsTrigger>
+        <TabsTrigger value="python">Python ML Guide</TabsTrigger>
+      </TabsList>
+
+      <TabsContent value="sessions" className="space-y-6">
       {/* Summary Stats */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <Card>
@@ -365,6 +375,25 @@ export const StudyLogs = () => {
           )}
         </CardContent>
       </Card>
-    </div>
+      </TabsContent>
+
+      <TabsContent value="analytics" className="space-y-6">
+        {/* ML Data Collection Display */}
+        <MLDataCollector 
+          isStudying={false}
+          currentMetrics={mlDataCollection.getCurrentMetrics()}
+          sessionCount={filteredLogs.length}
+        />
+        
+        {/* Add more analytics here */}
+      </TabsContent>
+
+      <TabsContent value="python" className="space-y-6">
+        <PythonAnalysisGuide 
+          onExportDataset={mlDataCollection.exportToCSV}
+          sessionCount={mlDataCollection.sessionData.length}
+        />
+      </TabsContent>
+    </Tabs>
   );
 };
