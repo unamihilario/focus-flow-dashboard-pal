@@ -231,7 +231,7 @@ def main():
         st.write("🟡 **Semi-Focused:** 40-69") 
         st.write("🔴 **Distracted:** 10-39")
     
-    # Sample Data Section
+    # Sample Data Section 
     st.header("📋 Sample Data")
     sample_data = load_sample_data()
     if sample_data is not None:
