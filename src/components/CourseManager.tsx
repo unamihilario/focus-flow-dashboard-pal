@@ -45,298 +45,66 @@ export const CourseManager: React.FC<CourseManagerProps> = ({
         }))
       }));
     }
-    return [
-      {
-        id: 'ai-ml-course',
-        title: 'AI/ML Course',
-        materials: [
-          {
-            id: 'unit-1',
-            name: 'Introduction to Machine Learning',
-            type: 'text',
-            size: 1024,
-            content: `Introduction to Machine Learning
+    return [{
+      id: 'ml-course',
+      title: 'Machine Learning Fundamentals',
+      materials: [
+        {
+          id: 'unit-1',
+          name: 'Introduction to Machine Learning',
+          type: 'text',
+          size: 1024,
+          content: `# Introduction to Machine Learning
 
-What is Machine Learning?
+## What is Machine Learning?
 
 Machine Learning (ML) is a subset of artificial intelligence (AI) that enables systems to learn and improve from experience without explicit programming.
 
-Key Concepts
+## Key Concepts
 
-1. Types of Machine Learning
-- Supervised Learning: Learning with labeled examples
+### 1. Types of Machine Learning
+- **Supervised Learning**: Learning with labeled examples
   - Classification (predicting categories)
   - Regression (predicting continuous values)
-- Unsupervised Learning: Finding patterns without labels
+- **Unsupervised Learning**: Finding patterns without labels
   - Clustering
   - Dimensionality reduction
-- Reinforcement Learning: Learning through interaction
+- **Reinforcement Learning**: Learning through interaction
 
-2. Python Libraries for ML
+### 2. Python Libraries for ML
+\`\`\`python
 import numpy as np
 import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LinearRegression
 from sklearn.metrics import accuracy_score
+\`\`\`
 
-3. Data Processing Pipeline
-Load data
+### 3. Data Processing Pipeline
+\`\`\`python
+# Load data
 data = pd.read_csv('dataset.csv')
 
-Preprocess
+# Preprocess
 X = data.drop('target', axis=1)
 y = data['target']
 
-Split data
+# Split data
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
 
-Train model
+# Train model
 model = LinearRegression()
 model.fit(X_train, y_train)
 
-Evaluate
+# Evaluate
 predictions = model.predict(X_test)
 score = accuracy_score(y_test, predictions)
-print(f"Model accuracy: {score}")`,
-            uploadDate: new Date()
-          }
-        ]
-      },
-      {
-        id: 'maths',
-        title: 'Mathematics',
-        materials: [
-          {
-            id: 'unit-1',
-            name: 'Introduction to Calculus',
-            type: 'text',
-            size: 1024,
-            content: `Introduction to Calculus
-
-What is Calculus?
-
-Calculus is the mathematical study of continuous change. It has two main branches: differential calculus (concerning rates of change) and integral calculus (concerning accumulation of quantities).
-
-Key Concepts
-
-1. Limits
-The foundation of calculus. A limit describes the value that a function approaches as the input approaches some value.
-
-Example:
-lim(x→2) (x² - 4)/(x - 2) = 4
-
-2. Derivatives
-Measures the rate of change of a function at any point.
-
-Basic derivative rules:
-- d/dx(x^n) = nx^(n-1)
-- d/dx(sin x) = cos x
-- d/dx(e^x) = e^x
-- d/dx(ln x) = 1/x
-
-3. Integrals
-The reverse of differentiation. Measures area under curves.
-
-Basic integral rules:
-- ∫ x^n dx = x^(n+1)/(n+1) + C
-- ∫ sin x dx = -cos x + C
-- ∫ e^x dx = e^x + C
-
-Applications:
-- Physics: velocity, acceleration
-- Engineering: optimization problems
-- Economics: marginal analysis`,
-            uploadDate: new Date()
-          }
-        ]
-      },
-      {
-        id: 'web-dev',
-        title: 'Web Development',
-        materials: [
-          {
-            id: 'unit-1',
-            name: 'Introduction to Web Development',
-            type: 'text',
-            size: 1024,
-            content: `Introduction to Web Development
-
-What is Web Development?
-
-Web development is the process of creating websites and web applications. It involves both front-end (client-side) and back-end (server-side) development.
-
-Key Technologies
-
-1. Frontend Technologies
-- HTML: Structure and content markup
-- CSS: Styling and layout
-- JavaScript: Interactive behavior
-
-Basic HTML structure:
-<!DOCTYPE html>
-<html>
-<head>
-    <title>My Website</title>
-</head>
-<body>
-    <h1>Welcome</h1>
-    <p>This is a paragraph.</p>
-</body>
-</html>
-
-2. CSS Styling
-CSS controls the visual appearance of web pages.
-
-Basic CSS example:
-body {
-    font-family: Arial, sans-serif;
-    margin: 0;
-    padding: 20px;
-}
-
-h1 {
-    color: blue;
-    text-align: center;
-}
-
-3. JavaScript Interactivity
-JavaScript adds dynamic behavior to websites.
-
-Basic JavaScript example:
-function greetUser() {
-    const name = prompt("What's your name?");
-    alert("Hello, " + name + "!");
-}
-
-4. Modern Frameworks
-- React: Component-based UI library
-- Vue.js: Progressive JavaScript framework
-- Angular: Full-featured framework`,
-            uploadDate: new Date()
-          }
-        ]
-      },
-      {
-        id: 'cs-theory',
-        title: 'Computer Science Theory',
-        materials: [
-          {
-            id: 'unit-1',
-            name: 'Introduction to Algorithms',
-            type: 'text',
-            size: 1024,
-            content: `Introduction to Algorithms
-
-What are Algorithms?
-
-An algorithm is a step-by-step procedure for solving a problem or completing a task. In computer science, algorithms are fundamental for writing efficient programs.
-
-Key Concepts
-
-1. Algorithm Complexity
-We measure algorithm efficiency using Big O notation:
-
-- O(1): Constant time
-- O(log n): Logarithmic time
-- O(n): Linear time
-- O(n²): Quadratic time
-- O(2^n): Exponential time
-
-2. Common Sorting Algorithms
-
-Bubble Sort (O(n²)):
-def bubble_sort(arr):
-    n = len(arr)
-    for i in range(n):
-        for j in range(0, n-i-1):
-            if arr[j] > arr[j+1]:
-                arr[j], arr[j+1] = arr[j+1], arr[j]
-
-Quick Sort (O(n log n) average):
-def quick_sort(arr):
-    if len(arr) <= 1:
-        return arr
-    pivot = arr[len(arr) // 2]
-    left = [x for x in arr if x < pivot]
-    middle = [x for x in arr if x == pivot]
-    right = [x for x in arr if x > pivot]
-    return quick_sort(left) + middle + quick_sort(right)
-
-3. Data Structures
-- Arrays: Fixed-size sequential collection
-- Linked Lists: Dynamic size, node-based
-- Stacks: Last In, First Out (LIFO)
-- Queues: First In, First Out (FIFO)
-- Trees: Hierarchical structure
-- Graphs: Networks of connected nodes`,
-            uploadDate: new Date()
-          }
-        ]
-      },
-      {
-        id: 'history',
-        title: 'History',
-        materials: [
-          {
-            id: 'unit-1',
-            name: 'Introduction to World History',
-            type: 'text',
-            size: 1024,
-            content: `Introduction to World History
-
-What is History?
-
-History is the study of past events, particularly in human affairs. It helps us understand how societies, cultures, and civilizations have developed over time.
-
-Key Historical Periods
-
-1. Ancient Civilizations (3000 BCE - 500 CE)
-- Mesopotamia: First cities and writing systems
-- Egypt: Pyramids and pharaohs
-- Greece: Democracy and philosophy
-- Rome: Empire and law systems
-
-Major developments:
-- Agriculture revolution
-- Development of writing
-- Formation of governments
-- Trade networks
-
-2. Medieval Period (500 - 1500 CE)
-- Fall of Roman Empire
-- Rise of Christianity and Islam
-- Feudalism in Europe
-- Byzantine Empire
-- Crusades and cultural exchange
-
-3. Renaissance and Exploration (1400 - 1600)
-- Revival of learning and art
-- Scientific revolution
-- Age of exploration
-- Printing press invention
-
-Key figures:
-- Leonardo da Vinci: Artist and inventor
-- Christopher Columbus: Explorer
-- Galileo Galilei: Astronomer
-
-4. Modern Era (1600 - present)
-- Industrial Revolution
-- Democratic revolutions
-- World Wars
-- Globalization
-- Digital age
-
-Understanding history helps us:
-- Learn from past mistakes
-- Understand current events
-- Appreciate cultural diversity
-- Develop critical thinking skills`,
-            uploadDate: new Date()
-          }
-        ]
-      }
-    ];
+print(f"Model accuracy: {score}")
+\`\`\``,
+          uploadDate: new Date()
+        }
+      ]
+    }];
   });
   
   const [newCourseName, setNewCourseName] = useState('');

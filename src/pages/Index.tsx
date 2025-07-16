@@ -169,15 +169,12 @@ const Index = () => {
           }
           setActiveTab(newTab);
         }} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-3 bg-white shadow-sm">
+          <TabsList className="grid w-full grid-cols-2 bg-white shadow-sm">
             <TabsTrigger value="study" className="data-[state=active]:bg-orange-100">
               Study Timer
             </TabsTrigger>
             <TabsTrigger value="logs" className="data-[state=active]:bg-indigo-100">
               Study Logs
-            </TabsTrigger>
-            <TabsTrigger value="analytics" className="data-[state=active]:bg-purple-100">
-              ML Analytics
             </TabsTrigger>
           </TabsList>
 
@@ -194,39 +191,6 @@ const Index = () => {
 
           <TabsContent value="logs" className="space-y-6">
             <StudyLogs />
-          </TabsContent>
-
-          <TabsContent value="analytics" className="space-y-6">
-            <div className="bg-gradient-to-br from-purple-50 to-indigo-50 p-6 rounded-lg border border-purple-200">
-              <h2 className="text-2xl font-bold text-purple-900 mb-4">🧠 Machine Learning Focus Predictor</h2>
-              <p className="text-purple-700 mb-4">
-                Advanced analytics using your study behavior data for CS Engineering ML project
-              </p>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="bg-white p-4 rounded-lg border">
-                  <h3 className="font-semibold text-purple-800 mb-2">📊 Model Features</h3>
-                  <ul className="text-sm text-purple-600 space-y-1">
-                    <li>• Session duration & timing patterns</li>
-                    <li>• Keystroke rate per minute</li>
-                    <li>• Tab switch frequency</li>
-                    <li>• Mouse movement intensity</li>
-                    <li>• Scroll activity levels</li>
-                    <li>• Inactivity period detection</li>
-                  </ul>
-                </div>
-                <div className="bg-white p-4 rounded-lg border">
-                  <h3 className="font-semibold text-purple-800 mb-2">🎯 ML Implementation</h3>
-                  <ul className="text-sm text-purple-600 space-y-1">
-                    <li>• Python scikit-learn integration</li>
-                    <li>• Decision Tree & Random Forest models</li>
-                    <li>• Productivity score prediction</li>
-                    <li>• Real-time focus classification</li>
-                    <li>• Feature importance analysis</li>
-                    <li>• Performance visualization</li>
-                  </ul>
-                </div>
-              </div>
-            </div>
           </TabsContent>
         </Tabs>
       </div>
