@@ -1,124 +1,81 @@
-Absolutely, Hilario. Here's a clean and professional version of your project overview for **StudySaver - ML-Powered Focus Analytics** that’s easy to read and presentation-ready:
+# StudySaver – ML-Powered Focus Analytics
 
----
+## 📌 Overview
+StudySaver is a browser-based productivity tracker designed for students to measure engagement during study sessions. It passively captures behavior such as tab switching, typing rhythm, mouse movement, scrolling, and inactivity—then uses machine learning to predict session focus levels. All data is exportable and supports downstream classification, analysis, and habit-building.
 
-# 🎓 StudySaver: ML-Powered Focus Analytics  
-**CS Engineering Project – Machine Learning Study Behavior Analysis**
+## 🚀 Live Demo
+Access the deployed dashboard here:  
+[Streamlit App – focus-flow-dashboard-pal](https://focus-flow-dashboard-pal-m2dfjzv7sy8mryvryc2wds.streamlit.app/)
 
----
+## 🧪 Features
+- Predictive focus scoring (Attentive, Semi-Focused, Distracted)
+- Real-time session input and feedback
+- Model performance charts and metrics
+- Dataset viewer with export capabilities
+- Study Tracker tab with weekly insights
 
-## 📌 Overview  
-**StudySaver** is a real-time study session tracker that captures behavioral data from user interactions to predict focus levels using machine learning. It outputs structured datasets for seamless integration with Python-based tools like **scikit-learn** and **pandas**.
+## 🎯 Focus Prediction Logic
+Session metrics include:
+- Duration
+- Tab switches
+- Keystroke rate
+- Mouse movement
+- Scroll activity
+- Inactivity periods
+- Subject category
 
----
+These are fed into a trained ML model (Decision Tree) for score prediction.
 
-## 🔬 ML Data Collection Features  
-Session metrics are recorded directly in-browser:
+## 🐍 Machine Learning
+Model training is handled with:
+- Python 3
+- pandas / numpy
+- scikit-learn
+- matplotlib / seaborn
 
-| Metric | Description |
-|-------|-------------|
-| **Session Duration** | Total active time in minutes |
-| **Tab Switch Duration** | Accumulated time away from study tab |
-| **Keystroke Rate** | Keystrokes per minute |
-| **Mouse Movements** | Total mouse interactions |
-| **Scroll Activity** | Number of scroll events |
-| **Inactivity Periods** | Count & duration of idle intervals |
+``python
+# Sample pipeline
+df = pd.read_csv('ml/ml_focus_dataset_2025-07-15.csv')
+X = df[[...]]
+y = df['productivity_score']
+model.fit(X, y)
 
----
+## 📦 Project Structure
+├── ml/
+│   ├── focus_productivity_predictor.py
+│   ├── focus_model.pkl
+│   ├── ml_focus_dataset_2025-07-15.csv
+├── requirements.txt
+├── index.html
+├── vite.config.ts
+├── tailwind.config.ts
 
-## 🎯 Focus Classification Logic  
-Custom classification based on behavioral cues—no camera needed.
+## 💻 Tech Stack
+Frontend: HTML, TypeScript, Tailwind, Vite
 
-```python
-distraction_ratio = tab_switch_duration_total / session_duration
-```
+Backend ML: Python, Streamlit
 
-| Classification | Conditions |
-|----------------|------------|
-| 🟢 **Attentive** | distraction_ratio < 0.2 and keystroke_rate ≥ 10 and scroll_activity ≥ 20 |
-| 🟡 **Semi-Attentive** | distraction_ratio between 0.2–0.5 or medium interaction |
-| 🔴 **Distracted** | distraction_ratio > 0.5 or low activity |
+Deployment: Streamlit Cloud
 
----
+Data Format: CSV
 
-## 📊 Dataset Export  
-- Exports structured **CSV** datasets
-- Pre-computed features: `productivity_score`, `distraction_ratio`
-- Ready for ML model training with **pandas** and **scikit-learn**
+## 🔗 Resources
+GitHub Repo: unamihilario/focus-flow-dashboard-pal
 
----
+Dataset: ml/ml_focus_dataset_2025-07-15.csv
 
-## 🐍 Python ML Pipeline Example  
-```python
-import pandas as pd
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.model_selection import train_test_split
+ML Script: focus_model.py
 
-df = pd.read_csv('ml_focus_dataset_YYYY-MM-DD.csv')
+Project Report: 12322069AIMLReport.docx
 
-features = ['duration_minutes', 'tab_switches', 'keystroke_rate_per_minute',
-            'mouse_movements_total', 'scroll_events_total', 'productivity_score']
-X = df[features]
-y = df['focus_classification']
+## 📚 Author
+Hilario Unami Ngwenya Summer Internship Project 2025 Lovely Professional University Course: Machine Learning Made Easy (PETV79)
 
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
-model = RandomForestClassifier()
-model.fit(X_train, y_train)
+## ✅ Deployment
+Use Streamlit Cloud with:
 
-print("Feature Importance:", model.feature_importances_)
-```
+Repository: unamihilario/focus-flow-dashboard-pal
 
----
+Branch: main
 
-## 🚀 How to Get Started  
-1. **Start Tracker** – Choose study material  
-2. **Study Naturally** – Data collected in background  
-3. **Review Results** – Post-session feedback  
-4. **Export Dataset** – Analyze in Python  
-5. **Train Models** – Build custom predictors
-
----
-
-## 📈 UI Dashboard Highlights  
-- **Focus Meter** – Real-time attention score  
-- **Distraction Timeline** – Graph of dips in focus  
-- **Session Summary** – Insights & feedback  
-- **Weekly Analytics** – Trends in study consistency
-
----
-
-## 🧠 Project Objectives  
-- Real-time behavioral tracking  
-- Predictive modeling from browser interactions  
-- Actionable student feedback  
-- Full-stack implementation: React + ML integration
-
----
-
-## 🔧 Tech Stack  
-- **Frontend**: React, TypeScript, Tailwind CSS  
-- **Tracking**: Custom Hooks for browser events  
-- **Storage**: localStorage  
-- **Export Format**: CSV for pandas  
-- **ML Tools**: Python, NumPy, scikit-learn  
-- **Dev Setup**:
-```bash
-git clone <YOUR_GIT_URL>
-cd <YOUR_PROJECT_NAME>
-npm i
-npm run dev
-```
-
----
-
-## 🌐 Links  
-- **Live Dashboard**: [focus-flow-dashboard-pal.vercel.app](https://focus-flow-dashboard-pal.vercel.app/)  
-- **GitHub**: [focus-flow-dashboard-pal](https://github.com/unamihilario/focus-flow-dashboard-pal)  
-- **Project Report (.docx)**: `12322069AIMLReport.docx`  
-- **Dataset (.csv)**: `ml_focus_dataset_2025-07-15.csv`  
-- - **ML Evaluation Script**: [focus_model.py](https://github.com/unamihilario/focus-flow-dashboard-pal/blob/main/focus_model.py)  
-  Includes model training, classification metrics, heatmaps, feature importance, and prediction export. 
-
----
-
-If you want this formatted as an actual webpage or printable document, I can help you convert it to HTML or Markdown too. Want that next?
+Main file: ml/focus_productivity_predictor.py
