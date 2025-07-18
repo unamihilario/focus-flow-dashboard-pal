@@ -11,13 +11,12 @@ import pandas as pd
 import numpy as np
 import pickle
 import matplotlib.pyplot as plt
-import seaborn as sns
 from sklearn.metrics import mean_absolute_error, r2_score
 import os
 
 # Configuration
 MODEL_FILE = 'ml/focus_model.pkl'
-CSV_FILE = 'ml/ml_focus_dataset_2025-07-15.csv'  # ✅ Path to training data
+CSV_FILE = 'ml/ml_focus_dataset_2025-07-15.csv'  # ✅ Training dataset
 
 @st.cache_data
 def load_model():
@@ -75,7 +74,6 @@ def create_model_performance_chart(model_package):
         features = ['duration_minutes', 'tab_switches', 'keystroke_rate_per_minute',
                     'mouse_movements_total', 'inactivity_periods_count',
                     'scroll_events_total']
-
         X = df[features + ['subject_encoded']]
         y_actual = df['productivity_score']
         y_pred = model_package['model'].predict(X)
@@ -83,6 +81,7 @@ def create_model_performance_chart(model_package):
         fig, ax = plt.subplots(figsize=(10, 6))
         ax.scatter(y_actual, y_pred, alpha=0.6, s=50, color='#2E86AB')
         ax.plot([10, 100], [10, 100], 'r--', lw=2, label='Perfect Prediction')
+
         ax.set_xlabel('Actual Score')
         ax.set_ylabel('Predicted Score')
         ax.set_title('Model Performance: Actual vs Predicted (Training Data)')
@@ -191,7 +190,7 @@ def main():
         st.write("🟡 **Semi-Focused:** 40–69")
         st.write("🔴 **Distracted:** 10–39")
 
-    # Optional: enable sample viewer if needed
+    # Optional: Sample Data Viewer
     # st.header("📋 Sample Data")
     # sample_data = load_sample_data()
     # if sample_data is not None:
