@@ -189,14 +189,14 @@ def main():
         st.write("🟡 **Semi-Focused:** 40–69")
         st.write("🔴 **Distracted:** 10–39")
 
-    # Optional: sample viewer
-    # st.header("📋 Sample Data")
-    # sample_data = load_sample_data()
-    # if sample_data is not None:
-    #     st.dataframe(sample_data[[
-    #         'session_id', 'subject', 'duration_minutes',
-    #         'tab_switches', 'productivity_score'
-    #     ]], use_container_width=True)
+    
+     st.header("📋 Sample Data")
+     sample_data = load_sample_data()
+     if sample_data is not None:
+         st.dataframe(sample_data[[
+             'session_id', 'subject', 'duration_minutes',
+             'tab_switches', 'productivity_score'
+         ]], use_container_width=True)
 
     st.markdown("---")
     st.markdown("🔬 **Focus Flow ML Dashboard** | Built with Streamlit & scikit-learn")
