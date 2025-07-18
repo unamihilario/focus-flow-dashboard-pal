@@ -17,7 +17,7 @@ import os
 
 # Configuration
 MODEL_FILE = 'ml/focus_model.pkl'
-CSV_FILE = 'ml/ml_focus_dataset_2025-07-15.csv'  # Corrected path
+CSV_FILE = 'ml/ml_focus_dataset_2025-07-15.csv'  # ✅ Corrected path
 
 @st.cache_data
 def load_model():
@@ -175,13 +175,14 @@ def main():
         else:
             st.info("👆 Enter your session parameters and click 'Predict Productivity'")
 
-     st.header("📈 Model Performance")
-     col3, col4 = st.columns([2, 1])
-     with col3:
-         with st.spinner("Loading performance chart..."):
-             fig = create_model_performance_chart(model_package)
-             if fig:
-                 st.pyplot(fig)
+    # ✅ ENABLED: Model Performance Visualization
+    st.header("📈 Model Performance")
+    col3, col4 = st.columns([2, 1])
+    with col3:
+        with st.spinner("Loading performance chart..."):
+            fig = create_model_performance_chart(model_package)
+            if fig:
+                st.pyplot(fig)
 
     with col2:
         st.subheader("📊 Model Metrics")
@@ -195,7 +196,7 @@ def main():
         st.write("🟡 **Semi-Focused:** 40–69")
         st.write("🔴 **Distracted:** 10–39")
 
-    # 📋 Optional: Sample data viewer
+    # 🔓 Sample Data Section (Optional: uncomment to enable)
     # st.header("📋 Sample Data")
     # sample_data = load_sample_data()
     # if sample_data is not None:
