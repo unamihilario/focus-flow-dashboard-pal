@@ -17,7 +17,7 @@ import os
 
 # Configuration
 MODEL_FILE = 'ml/focus_model.pkl'
-CSV_FILE = 'ml/ml_focus_dataset_2025-07-15.csv'  # ✅ Corrected path
+CSV_FILE = 'ml/ml_focus_dataset_2025-07-15.csv'  # Corrected path
 
 @st.cache_data
 def load_model():
@@ -194,7 +194,8 @@ def main():
         st.write("🟢 **Attentive:** 70–100")
         st.write("🟡 **Semi-Focused:** 40–69")
         st.write("🔴 **Distracted:** 10–39")
-        
+
+    # 📋 Optional: Sample data viewer
     # st.header("📋 Sample Data")
     # sample_data = load_sample_data()
     # if sample_data is not None:
