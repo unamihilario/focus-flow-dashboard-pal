@@ -12,7 +12,6 @@ import numpy as np
 import pickle
 import matplotlib.pyplot as plt
 from sklearn.metrics import mean_absolute_error, r2_score
-import os
 
 # Configuration
 MODEL_FILE = 'ml/focus_model.pkl'
