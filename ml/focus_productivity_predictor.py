@@ -184,10 +184,10 @@ def main():
         st.metric("MAE", f"{mae:.2f}" if mae else "N/A")
         st.metric("Training Data", "300+ sessions")
 
-        st.subheader("🎯 Focus Thresholds")
-        st.write("🟢 **Attentive:** 70–100")
-        st.write("🟡 **Semi-Focused:** 40–69")
-        st.write("🔴 **Distracted:** 10–39")
+    #    st.subheader("🎯 Focus Thresholds")
+     #   st.write("🟢 **Attentive:** 70–100")
+      #  st.write("🟡 **Semi-Focused:** 40–69")
+       # st.write("🔴 **Distracted:** 10–39")
 
     # Optional: sample viewer
     # st.header("📋 Sample Data")
