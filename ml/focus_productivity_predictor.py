@@ -3,7 +3,7 @@
 Focus Productivity Predictor - Streamlit Web App
 
 Predicts study session productivity scores based on behavioral metrics
-and displays model performance metrics.
+and displays model performance metrics (chart hidden via toggle).
 """
 
 import streamlit as st
@@ -39,19 +39,32 @@ def get_training_metrics(model_package):
     try:
         df = pd.read_csv(CSV_FILE)
         df['subject_encoded'] = model_package['label_encoder'].transform(df['subject'])
-
         features = ['duration_minutes', 'tab_switches', 'keystroke_rate_per_minute',
-                    'mouse_movements_total', 'inactivity_periods_count',
-                    'scroll_events_total']
+                    'mouse_movements_total', 'inactivity_periods_count', 'scroll_events_total']
         X = df[features + ['subject_encoded']]
         y_actual = df['productivity_score']
         y_pred = model_package['model'].predict(X)
-
         r2 = r2_score(y_actual, y_pred)
         mae = mean_absolute_error(y_actual, y_pred)
-        return r2, mae
+        return r2, mae, y_actual, y_pred
     except Exception:
-        return None, None
+        return None, None, None, None
+
+def fig_from_data(y_actual, y_pred):
+    import matplotlib.pyplot as plt
+    fig, ax = plt.subplots(figsize=(10, 6))
+    ax.scatter(y_actual, y_pred, alpha=0.6, s=50, color='#2E86AB')
+    ax.plot([10, 100], [10, 100], 'r--', lw=2, label='Perfect Prediction')
+    ax.set_xlabel('Actual Score')
+    ax.set_ylabel('Predicted Score')
+    ax.set_title('Model Performance: Actual vs Predicted (Training Data)')
+    ax.legend()
+    ax.grid(True, alpha=0.3)
+    textstr = f'R² = {r2_score(y_actual, y_pred):.3f}\nMAE = {mean_absolute_error(y_actual, y_pred):.2f}'
+    props = dict(boxstyle='round', facecolor='wheat', alpha=0.8)
+    ax.text(0.05, 0.95, textstr, transform=ax.transAxes, fontsize=11,
+            verticalalignment='top', bbox=props)
+    return fig
 
 def predict_productivity(model_package, duration, tab_switches, keystroke_rate,
                          mouse_movements, inactivity_periods, scroll_events, subject):
@@ -85,7 +98,11 @@ def main():
     if model_package is None:
         st.stop()
 
-    r2, mae = get_training_metrics(model_package)
+    # 🔒 Toggle chart visibility (set to False to hide)
+    show_chart = False
+
+    r2, mae, y_actual, y_pred = get_training_metrics(model_package)
+    chart_fig = fig_from_data(y_actual, y_pred) if show_chart and y_actual is not None else None
 
     col1, col2 = st.columns([1, 1])
     with col1:
@@ -116,40 +133,52 @@ def main():
         if hasattr(st.session_state, 'prediction'):
             score = st.session_state.prediction
             focus_level, color = get_focus_level(score)
-
             st.metric("Productivity Score", f"{score:.1f}/100")
             st.markdown(f"**Focus Level:** {focus_level}")
             st.progress(score / 100)
-
             st.subheader("💡 Insights")
             input_data = st.session_state.input_data
-
             if score >= 70:
                 st.success("Great focus! You're likely to have a productive session.")
             elif score >= 40:
                 st.warning("Moderate focus. Try minimizing distractions.")
             else:
                 st.error("Low focus predicted. Consider taking a break or changing environment.")
-
             if input_data['tab_switches'] > 10:
                 st.info("💡 High tab switching detected. Try using focus apps.")
             if input_data['duration'] > 60:
                 st.info("💡 Long session planned. Break it into chunks.")
         else:
-            st.info("👆 Enter your session parameters and click 'Predict Productivity'")
+            st.info("👆 Enter session parameters and click 'Predict Productivity'")
 
     st.header("📈 Model Performance")
-    with st.container():
-        st.subheader("📊 Model Metrics")
-        st.metric("Model Type", "Decision Tree")
-        st.metric("R² Score", f"{r2:.3f}" if r2 else "N/A")
-        st.metric("MAE", f"{mae:.2f}" if mae else "N/A")
-        st.metric("Training Data", "300+ sessions")
-
-        st.subheader("🎯 Focus Thresholds")
-        st.write("🟢 **Attentive:** 70–100")
-        st.write("🟡 **Semi-Focused:** 40–69")
-        st.write("🔴 **Distracted:** 10–39")
+    if show_chart:
+        col3, col4 = st.columns([2, 1])
+        with col3:
+            with st.spinner("Loading performance chart..."):
+                if chart_fig:
+                    st.pyplot(chart_fig)
+        with col4:
+            st.subheader("📊 Model Metrics")
+            st.metric("Model Type", "Decision Tree")
+            st.metric("R² Score", f"{r2:.3f}" if r2 else "N/A")
+            st.metric("MAE", f"{mae:.2f}" if mae else "N/A")
+            st.metric("Training Data", "300+ sessions")
+            st.subheader("🎯 Focus Thresholds")
+            st.write("🟢 **Attentive:** 70–100")
+            st.write("🟡 **Semi-Focused:** 40–69")
+            st.write("🔴 **Distracted:** 10–39")
+    else:
+        with st.container():
+            st.subheader("📊 Model Metrics")
+            st.metric("Model Type", "Decision Tree")
+            st.metric("R² Score", f"{r2:.3f}" if r2 else "N/A")
+            st.metric("MAE", f"{mae:.2f}" if mae else "N/A")
+            st.metric("Training Data", "300+ sessions")
+            st.subheader("🎯 Focus Thresholds")
+            st.write("🟢 **Attentive:** 70–100")
+            st.write("🟡 **Semi-Focused:** 40–69")
+            st.write("🔴 **Distracted:** 10–39")
 
     st.markdown("---")
     st.markdown("🔬 **Focus Flow ML Dashboard** | Built with Streamlit & scikit-learn")
