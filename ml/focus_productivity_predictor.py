@@ -194,7 +194,7 @@ def main():
         st.write("🟢 **Attentive:** 70–100")
         st.write("🟡 **Semi-Focused:** 40–69")
         st.write("🔴 **Distracted:** 10–39")
-
+        
     # st.header("📋 Sample Data")
     # sample_data = load_sample_data()
     # if sample_data is not None:
