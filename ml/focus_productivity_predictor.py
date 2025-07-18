@@ -175,15 +175,16 @@ def main():
         else:
             st.info("👆 Enter your session parameters and click 'Predict Productivity'")
 
-    st.header("📈 Model Performance")
-    col3, col4 = st.columns([2, 1])
-    with col3:
-        with st.spinner("Loading performance chart..."):
-            fig = create_model_performance_chart(model_package)
-            if fig:
-                st.pyplot(fig)
+    # 🔒 Optional Model Performance Section (Commented Out)
+    # st.header("📈 Model Performance")
+    # col3, col4 = st.columns([2, 1])
+    # with col3:
+    #     with st.spinner("Loading performance chart..."):
+    #         fig = create_model_performance_chart(model_package)
+    #         if fig:
+    #             st.pyplot(fig)
 
-    with col4:
+    with col2:
         st.subheader("📊 Model Metrics")
         st.metric("Model Type", "Decision Tree")
         st.metric("R² Score", "0.98")
@@ -195,13 +196,14 @@ def main():
         st.write("🟡 **Semi-Focused:** 40–69")
         st.write("🔴 **Distracted:** 10–39")
 
-    st.header("📋 Sample Data")
-    sample_data = load_sample_data()
-    if sample_data is not None:
-        st.dataframe(sample_data[[
-            'session_id', 'subject', 'duration_minutes',
-            'tab_switches', 'productivity_score'
-        ]], use_container_width=True)
+    # 🔒 Optional Sample Data Viewer (Commented Out)
+    # st.header("📋 Sample Data")
+    # sample_data = load_sample_data()
+    # if sample_data is not None:
+    #     st.dataframe(sample_data[[
+    #         'session_id', 'subject', 'duration_minutes',
+    #         'tab_switches', 'productivity_score'
+    #     ]], use_container_width=True)
 
     st.markdown("---")
     st.markdown("🔬 **Focus Flow ML Dashboard** | Built with Streamlit & scikit-learn")
